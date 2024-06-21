@@ -45,141 +45,135 @@ export default function Signup() {
       <Toaster />
       <div className="flex h-screen bg-gradient-to-b from-indigo-800 to-indigo-600">
         <div className="m-auto w-full max-w-md">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-white">
+          <div>
+            <h2 className="mt-6 text-3xl font-extrabold text-white text-left">
               Sign up for an account
             </h2>
           </div>
 
           <div className="mt-8 bg-white shadow-md rounded-md p-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
+              
+              {/* Name */}
+              <div className="flex flex-col">
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700"
                 >
                   Name
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Enter your name"
-                  />
-                </div>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter your name"
+                />
               </div>
 
-              <div>
+              {/* Email address */}
+              <div className="flex flex-col">
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700"
                 >
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Enter your email address"
-                  />
-                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter your email address"
+                />
               </div>
 
-              <div>
+              {/* Position */}
+              <div className="flex flex-col">
                 <label
                   htmlFor="position"
-                  className="block text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-700"
                 >
                   Position
                 </label>
-                <div className="mt-1">
-                  <select
-                    id="position"
-                    name="position"
-                    required
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
-                    <option value="" disabled>Select your position</option>
-                    <option value="student">Student</option>
-                    <option value="accountant">Accountant</option>
-                    <option value="chief-warden">Chief Warden</option>
-                  </select>
-                </div>
+                <select
+                  id="position"
+                  name="position"
+                  required
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option value="" disabled>Select your position</option>
+                  <option value="student">Student</option>
+                  <option value="accountant">Accountant</option>
+                  <option value="chief-warden">Chief Warden</option>
+                </select>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                </div>
-                <div className="mt-1">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Enter your password"
-                  />
-                </div>
+              {/* Password */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter your password"
+                />
               </div>
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="confirm-password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Confirm Password
-                  </label>
-                </div>
-                <div className="mt-1">
-                  <input
-                    id="confirm-password"
-                    name="confirm-password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="Enter confirm password"
-                  />
-                </div>
+              {/* Confirm Password */}
+              <div className="flex flex-col">
+                <label
+                  htmlFor="confirm-password"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Confirm Password
+                </label>
+                <input
+                  id="confirm-password"
+                  name="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter confirm password"
+                />
               </div>
 
-              <div>
+              {/* Submit Button */}
+              <div className="flex">
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="w-full justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Sign up
                 </button>
               </div>
             </form>
 
-            <div className="mt-4 text-center">
+            {/* Already have an account link */}
+            <div className="mt-4 text-left">
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
                 <Link
