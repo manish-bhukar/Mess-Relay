@@ -40,7 +40,7 @@ export default function Login() {
       // Confirm the token is set in local storage
       console.log("Token set in localStorage:", localStorage.getItem("token"));
       
-      navigate("/home");
+      navigate("/studentmain");
       window.location.reload();
       toast.success(response.data.message);
     } catch (error) {
