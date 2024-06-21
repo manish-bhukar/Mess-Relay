@@ -58,15 +58,15 @@ export default function Login() {
   return (
     <>
       <Toaster />
-      <div className="flex h-screen bg-gradient-to-b from-indigo-800 to-indigo-600">
-        <div className="m-auto w-full max-w-md">
+      <div className="flex h-screen bg-cover bg-center" style={{ backgroundImage: `url('https://media.istockphoto.com/id/1191080960/photo/traditional-turkish-breakfast-and-people-taking-various-food-wide-composition.jpg?s=612x612&w=0&k=20&c=PP5ejMisEwzcLWrNmJ8iPPm_u-4P6rOWHEDpBPL2n7Q=')` }}>
+        <div className="m-auto w-full max-w-md bg-white bg-opacity-80 rounded-lg shadow-lg p-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-white">
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
               Log in to your account
             </h2>
           </div>
 
-          <div className="mt-8 bg-white shadow-md rounded-md p-8">
+          <div className="mt-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label
