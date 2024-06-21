@@ -4,6 +4,8 @@ import Signup from './Component/Signup';
 import Login from './Component/Login';
 import StudentDashboard from '../src/Component//Student/Frontpage'
 import StudentComplaint from '../src/Component/Student/Complaint'
+import ContactPage from './Component/Student/ContactPage';
+import AccountantDashboard from '../src/Component/Accountant/Dashboard'
 function App() {
   return (
     <div className="App">
@@ -13,6 +15,8 @@ function App() {
           <Route path="/login" element={<Login/>}/>
           <Route path="/studentmain" element={<StudentDashboard />}/>
           <Route path="/complain" element={<StudentComplaint/>}/>
+          <Route path='/contact' element={<ContactPage/>}/>
+          <Route path="/accountant" element={<AccountantDashboard/>}/>
         </Routes>
       </Router>
     </div>
