@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const fileUpload = require("express-fileupload");
 const userRoutes = require('./Routes/UserRoute.js');
-const complaintsRoutes=require('./Routes/ComplaintRoute.js')
+const complaintsRoutes=require('./Routes/ComplaintRoute.js');
+const expenseRoutes=require('./Routes/ExpenseRoute.js')
 const cors = require('cors');
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(fileUpload());
 
 app.use('/user', userRoutes);
 app.use("/complaints", complaintsRoutes);
+app.use('/expenses', expenseRoutes);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
