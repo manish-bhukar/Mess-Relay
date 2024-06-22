@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Expenses from './Expenses'; // Import Expenses sub-component
+import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMenuItem, setSelectedMenuItem] = useState('expenses');
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchExpenses();
-  }, [selectedYear]);
+  }, []);
+
+  const handleMenuItemClick = (menuItem) => {
+    setSelectedMenuItem(menuItem);
+  };
 
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/expenses/${selectedYear}`);
+      const response = await axios.get('http://localhost:5000/expenses');
       setExpenses(response.data);
     } catch (error) {
       console.error('Error fetching expenses:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleMenuItemClick = (menuItem) => {
-    setSelectedMenuItem(menuItem);
-  };
-
-  const handleYearChange = (year) => {
-    setSelectedYear(year);
   };
 
   const handleExpenseUpdate = async (updatedExpense) => {
@@ -51,10 +48,10 @@ const Dashboard = () => {
     }
   };
 
-
   const handleLogout = () => {
     // Implement your logout logic here
     console.log('Logging out...');
+    navigate('/login');
   };
 
   return (
@@ -68,8 +65,6 @@ const Dashboard = () => {
         expenses={expenses}
         onExpenseUpdate={handleExpenseUpdate}
         loading={loading}
-        selectedYear={selectedYear}
-        handleYearChange={handleYearChange}
         handleLogout={handleLogout}
       />
     </div>
@@ -115,15 +110,7 @@ const MenuItem = ({ text, isSelected, onClick }) => {
 };
 
 // MainContent Component
-const MainContent = ({
-  selectedMenuItem,
-  expenses,
-  onExpenseUpdate,
-  loading,
-  selectedYear,
-  handleYearChange,
-  handleLogout,
-}) => {
+const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, handleLogout }) => {
   return (
     <div className="flex-1 bg-gray-100 p-8">
       {/* Logout Button */}
@@ -136,33 +123,9 @@ const MainContent = ({
         </button>
       </div>
 
-      {/* Year Selector */}
-      <div className="mb-8 flex justify-end">
-        <YearSelector selectedYear={selectedYear} handleYearChange={handleYearChange} />
-      </div>
-
       {/* Main Content Area */}
       <MainContentArea selectedMenuItem={selectedMenuItem} expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />
     </div>
-  );
-};
-
-// YearSelector Component
-const YearSelector = ({ selectedYear, handleYearChange }) => {
-  return (
-    <select
-      className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-      value={selectedYear}
-      onChange={(e) => handleYearChange(e.target.value)}
-    >
-      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-        <option key={month} value={month}>
-          {new Date(selectedYear, month - 1, 1).toLocaleString('default', {
-            month: 'long',
-          })}
-        </option>
-      ))}
-    </select>
   );
 };
 
@@ -172,46 +135,7 @@ const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading 
     <div>
       {/* Conditional Rendering based on selectedMenuItem */}
       {selectedMenuItem === 'expenses' && <Expenses expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />}
-
-      {selectedMenuItem === 'add-expense' && (
-        <div>
-          {/* Add Expense Component */}
-          <h2 className="text-xl font-bold mb-4">Add Expense</h2>
-          {/* Add your form or component for adding expenses */}
-        </div>
-      )}
-
-      {selectedMenuItem === 'mess-menu' && (
-        <div>
-          {/* Mess Menu Component */}
-          <h2 className="text-xl font-bold mb-4">Mess Menu</h2>
-          {/* Add your Mess Menu component */}
-        </div>
-      )}
-
-      {selectedMenuItem === 'unresolved-complaints' && (
-        <div>
-          {/* Unresolved Complaints Component */}
-          <h2 className="text-xl font-bold mb-4">Unresolved Complaints</h2>
-          {/* Add your Unresolved Complaints component */}
-        </div>
-      )}
-
-      {selectedMenuItem === 'resolved-complaints' && (
-        <div>
-          {/* Resolved Complaints Component */}
-          <h2 className="text-xl font-bold mb-4">Resolved Complaints</h2>
-          {/* Add your Resolved Complaints component */}
-        </div>
-      )}
-
-      {selectedMenuItem === 'notices' && (
-        <div>
-          {/* Notices Component */}
-          <h2 className="text-xl font-bold mb-4">Notices</h2>
-          {/* Add your Notices component */}
-        </div>
-      )}
+      {/* Add other conditional rendering based on selectedMenuItem */}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 // controllers/ExpenseController.js
 const Expense = require('../Models/ExpenseModel.js');
 const mongoose = require('mongoose');
+
 const getExpensesByYear = async (req, res) => {
   const { year } = req.params;
   const userId = req.user._id;
@@ -15,8 +16,13 @@ const getExpensesByYear = async (req, res) => {
 };
 
 const saveExpense = async (req, res) => {
-  const { year, month, categories, total } = req.body;
+  const { month, vegetable, fruits, provisions, other, total, year } = req.body;
   const userId = req.user._id;
+
+  // Check for required fields
+  if (!month || !vegetable || !fruits || !provisions || !other || !total || !year) {
+    return res.status(400).json({ error: 'Please fill in all fields' });
+  }
 
   try {
     const newExpense = new Expense({
@@ -24,10 +30,10 @@ const saveExpense = async (req, res) => {
       year,
       month,
       categories: {
-        vegetable: categories.vegetable || 0,
-        fruits: categories.fruits || 0,
-        provisions: categories.provisions || 0,
-        other: categories.other || 0,
+        vegetable: vegetable || 0,
+        fruits: fruits || 0,
+        provisions: provisions || 0,
+        other: other || 0,
       },
       total,
     });
@@ -41,34 +47,44 @@ const saveExpense = async (req, res) => {
 };
 
 const editExpense = async (req, res) => {
-    const { id } = req.params;
-    const { year, month, categories, total } = req.body;
+  const { id } = req.params;
+  const { year, month, categories, total } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid expense ID' });
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Invalid expense ID' });
+  }
+
+  // Check for required fields
+  if (!year || !month || !categories || !total) {
+    return res.status(400).json({ error: 'Please fill in all fields' });
+  }
+
+  try {
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      id,
+      {
+        year,
+        month,
+        categories: {
+          vegetable: categories.vegetable || 0,
+          fruits: categories.fruits || 0,
+          provisions: categories.provisions || 0,
+          other: categories.other || 0,
+        },
+        total,
+      },
+      { new: true }
+    );
+
+    if (!updatedExpense) {
+      return res.status(404).json({ error: 'Expense not found' });
     }
 
-    try {
-        const updatedExpense = await Expense.findByIdAndUpdate(id, {
-            year,
-            month,
-            categories: {
-                vegetable: categories.vegetable || 0,
-                fruits: categories.fruits || 0,
-                provisions: categories.provisions || 0,
-                other: categories.other || 0,
-            },
-            total,
-        }, { new: true });
-
-        if (!updatedExpense) {
-            return res.status(404).json({ error: 'Expense not found' });
-        }
-
-        res.json({ message: 'Expense updated successfully', expense: updatedExpense });
-    } catch (error) {
-        console.error('Error updating expense:', error);
-        res.status(500).json({ error: 'Failed to update expense' });
-    }
+    res.json({ message: 'Expense updated successfully', expense: updatedExpense });
+  } catch (error) {
+    console.error('Error updating expense:', error);
+    res.status(500).json({ error: 'Failed to update expense' });
+  }
 };
+
 module.exports = { getExpensesByYear, saveExpense, editExpense };

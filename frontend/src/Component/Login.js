@@ -1,9 +1,11 @@
+// components/Login.js
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
-export default function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,26 +27,28 @@ export default function Login() {
         }
       );
 
-      // Log the response
-      console.log("response", response.data);
-      
-      // Set token in Authorization header
-      console.log("token", response.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      // Set token in Authorization header for future requests
+      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
 
+      // Save token and user info in localStorage
       localStorage.setItem("token", response.data.token);
-     
       localStorage.setItem("userId", response.data._id);
       localStorage.setItem("emailId", response.data.email);
 
-      // Confirm the token is set in local storage
-      console.log("Token set in localStorage:", localStorage.getItem("token"));
-      
-      navigate("/studentmain");
-      window.location.reload();
       toast.success(response.data.message);
+
+      // Navigate based on user role/position
+      const position = response.data.position;
+      if (position === "accountant") {
+        navigate("/accountant");
+      } else if (position === "student") {
+        navigate("/studentmain");
+      } else {
+        // Handle other roles if needed
+        navigate("/");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Login error:", error);
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message);
         toast.error(error.response.data.message);
@@ -58,7 +62,11 @@ export default function Login() {
   return (
     <>
       <Toaster />
-      <div className="flex h-screen bg-cover bg-center" style={{ backgroundImage: `url('https://media.istockphoto.com/id/1191080960/photo/traditional-turkish-breakfast-and-people-taking-various-food-wide-composition.jpg?s=612x612&w=0&k=20&c=PP5ejMisEwzcLWrNmJ8iPPm_u-4P6rOWHEDpBPL2n7Q=')` }}>
+      <div className="flex h-screen bg-cover bg-center"
+        style={{
+          backgroundImage: `url('https://media.istockphoto.com/id/1191080960/photo/traditional-turkish-breakfast-and-people-taking-various-food-wide-composition.jpg?s=612x612&w=0&k=20&c=PP5ejMisEwzcLWrNmJ8iPPm_u-4P6rOWHEDpBPL2n7Q=')`,
+        }}
+      >
         <div className="m-auto w-full max-w-md bg-white bg-opacity-80 rounded-lg shadow-lg p-8">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
@@ -146,4 +154,6 @@ export default function Login() {
       </div>
     </>
   );
-}
+};
+
+export default Login;
