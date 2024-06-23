@@ -5,6 +5,7 @@ const fileUpload = require("express-fileupload");
 const userRoutes = require('./Routes/UserRoute.js');
 const complaintsRoutes=require('./Routes/ComplaintRoute.js');
 const expenseRoutes=require('./Routes/ExpenseRoute.js')
+const noticeRoute=require('./Routes/noticeroutes.js');
 const cors = require('cors');
 
 dotenv.config();
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 app.use(fileUpload());
 app.use("/uploads",express.static("uploads"));
-
+app.use("/notices",noticeRoute);
 app.use('/user', userRoutes);
 app.use("/complaints", complaintsRoutes);
 app.use('/expenses', expenseRoutes);

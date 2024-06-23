@@ -43,7 +43,11 @@ const Login = () => {
         navigate("/accountant");
       } else if (position === "student") {
         navigate("/studentmain");
-      } else {
+      } 
+      else if(position==="chief-warden"){
+        navigate("/chiefwarden");
+      }
+      else {
         // Handle other roles if needed
         navigate("/");
       }

@@ -1,91 +1,38 @@
+const Notice = require("../Models/Notice.js");
 const path = require("path");
-const fs = require("fs");
-const multer = require("multer");
 
-const filename = __filename;
-const __dirname1 = path.dirname(filename);
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads_Notice/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname); // Use the original filename
-  },
-});
-
-const upload = multer({ storage: storage });
-
-// Handle file upload and cleanup old files
-const uploadFiles = (req, res) => {
-  console.log('Received files:', req.files);
-
-  const uploadDir = path.join(__dirname1, '../uploads_Notice');
-  const notices = fs.readdirSync(uploadDir);
-
-  // Sort files by modification time (newest first)
-  const sortedFiles = notices
-    .map((file) => ({ name: file, time: fs.statSync(path.join(uploadDir, file)).mtime.getTime() }))
-    .sort((a, b) => b.time - a.time)
-    .map((file) => file.name);
-
-  // Keep only the newest three files
-  const newestFiles = sortedFiles.slice(0, 3);
-
-  // Remove old files from the uploads folder
-  notices.forEach((file) => {
-    if (!newestFiles.includes(file)) {
-      const filePath = path.join(uploadDir, file);
-      fs.unlinkSync(filePath); // Delete the old file
+const addNotice = async (req, res) => {
+  try {
+    if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
+      return res.status(400).send("No files were uploaded.");
     }
-  });
+    console.log(req.files.file);
+    const file = req.files.file; // Access the uploaded file
 
-  console.log('Files processed successfully');
-  res.sendStatus(200);
-};
+    // Move the uploaded file to the uploads directory
+    const fileName = `${Date.now()}_${file.name}`;
 
-// Download a notice file
-const downloadFile = (req, res) => {
-  const filePath = path.join(__dirname1, '../uploads_Notice', req.params.filename);
+    const uploadPath = `${__dirname}/../uploads/${fileName}`;
+    file.mv(uploadPath, async (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send(err);
+      }
 
-  // Check if the file exists
-  if (!fs.existsSync(filePath)) {
-    console.error('File not found:', req.params.filename);
-    return res.status(404).send('File not found');
+      // Save notice details to MongoDB
+      const newNotice = new Notice({
+        file: `/uploads/${fileName}`, // Store the file path
+      });
+      await newNotice.save();
+
+      res.json({ message: "Notice added successfully", notice: newNotice });
+    });
+  } catch (error) {
+    console.error("Error adding notice:", error);
+    res.status(500).send("Failed to add notice. Please try again later.");
   }
-
-  console.log('Downloading file:', req.params.filename);
-  // Set Content-Disposition header to prompt download
-  res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
-
-  // Stream the file to the response
-  const fileStream = fs.createReadStream(filePath);
-  fileStream.pipe(res);
 };
-
-// Fetch list of notices
-const getNotices = (req, res) => {
-  const uploadDir = path.join(__dirname1, '../uploads_Notice');
-  console.log('Fetching notice list...');
-
-  const notices = fs.readdirSync(uploadDir).map((file) => {
-    const filePath = path.join(uploadDir, file);
-    const stat = fs.statSync(filePath);
-
-    return {
-      name: file,
-      url: `http://localhost:3000/uploads_Notice/${file}`,
-      timestamp: stat.mtime, // Include the timestamp
-    };
-  });
-
-  console.log('Notices fetched successfully:', notices);
-  res.json(notices);
-};
-
 
 module.exports = {
-  getNotices,
-  downloadFile,
-  uploadFiles,
+  addNotice,
 };

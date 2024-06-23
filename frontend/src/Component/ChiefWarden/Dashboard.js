@@ -27,7 +27,7 @@ const ChiefWardenDashboard = () => {
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/complaints');
+      const response = await axios.get('http://localhost:5000/complaints/getcomplaints');
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
