@@ -7,6 +7,8 @@ import StudentComplaint from '../src/Component/Student/Complaint'
 import ContactPage from './Component/Student/ContactPage';
 import AccountantDashboard from '../src/Component/Accountant/Dashboard'
 import ComplainStatus from '../src/Component/Student/Complainstatus'
+import ChiefWardenDashboard from '../src/Component/ChiefWarden/Dashboard.js';
+import AddNotice from './Component/ChiefWarden/Notice.js';
 function App() {
   return (
     <div className="App">
@@ -19,6 +21,8 @@ function App() {
           <Route path='/contact' element={<ContactPage/>}/>
           <Route path="/accountant" element={<AccountantDashboard/>}/>
           <Route path="/complainstatus" element={<ComplainStatus/>}/>
+          <Route path="/chiefwarden" element={<ChiefWardenDashboard/>}/>
+          <Route path="/notice" element={<AddNotice/>}/>
         </Routes>
       </Router>
     </div>
