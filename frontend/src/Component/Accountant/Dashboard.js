@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Expenses from './Expenses'; // Import Expenses sub-component
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState('expenses');
@@ -15,6 +15,9 @@ const Dashboard = () => {
 
   const handleMenuItemClick = (menuItem) => {
     setSelectedMenuItem(menuItem);
+    if (menuItem === 'all-complaints') {
+      navigate('/complainstatus');
+    }
   };
 
   const fetchExpenses = async () => {
@@ -83,14 +86,9 @@ const Sidebar = ({ selectedMenuItem, handleMenuItemClick }) => {
         <MenuItem text="Expenses" isSelected={selectedMenuItem === 'expenses'} onClick={() => handleMenuItemClick('expenses')} />
         <MenuItem text="Mess Menu" isSelected={selectedMenuItem === 'mess-menu'} onClick={() => handleMenuItemClick('mess-menu')} />
         <MenuItem
-          text="Unresolved Complaints"
-          isSelected={selectedMenuItem === 'unresolved-complaints'}
-          onClick={() => handleMenuItemClick('unresolved-complaints')}
-        />
-        <MenuItem
-          text="Resolved Complaints"
-          isSelected={selectedMenuItem === 'resolved-complaints'}
-          onClick={() => handleMenuItemClick('resolved-complaints')}
+          text="All Complaints"
+          isSelected={selectedMenuItem === 'all-complaints'}
+          onClick={() => handleMenuItemClick('all-complaints')}
         />
         <MenuItem text="Notices" isSelected={selectedMenuItem === 'notices'} onClick={() => handleMenuItemClick('notices')} />
       </ul>
