@@ -10,6 +10,8 @@ function DashboardMain() {
     setSelectedMenuItem(menuItem);
     if (menuItem === "Dashboard") {
       navigate("/studentmain");
+    } else if (menuItem === "Previous Complaints") {
+      navigate("/complainstatus");
     } else {
       navigate(`/${menuItem.toLowerCase().replace(/ /g, "-")}`);
     }
@@ -23,8 +25,7 @@ function DashboardMain() {
   const menuItems = [
     "Dashboard",
     "Complain",
-    "Unresolved Complains",
-    "Resolved Complains",
+    "Previous Complaints",
     "Mess Menu",
     "WebCrator",
     "Rules",
@@ -47,7 +48,9 @@ function DashboardMain() {
           {menuItems.map((item) => (
             <li key={item} className="mb-4">
               <button
-                className={`w-full text-left p-2 rounded hover:bg-gray-700 ${selectedMenuItem === item ? 'bg-gray-700' : ''}`}
+                className={`w-full text-left p-2 rounded hover:bg-gray-700 ${
+                  selectedMenuItem === item ? "bg-gray-700" : ""
+                }`}
                 onClick={() => handleMenuItemClick(item)}
               >
                 {item}
@@ -71,7 +74,18 @@ function DashboardMain() {
         ) : (
           <div>
             <h1 className="text-2xl font-bold">{selectedMenuItem}</h1>
-            {/* Here you can render the content based on the selected menu item */}
+            {/* Render content based on the selected menu item */}
+            {selectedMenuItem === "Complain" && (
+              <div>
+                {/* Render complaints content */}
+              </div>
+            )}
+            {selectedMenuItem === "Previous Complaints" && (
+              <div>
+                {/* Render previous complaints content */}
+              </div>
+            )}
+            {/* Add more conditions for other menu items */}
           </div>
         )}
       </div>

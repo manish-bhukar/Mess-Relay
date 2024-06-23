@@ -6,6 +6,7 @@ import StudentDashboard from '../src/Component//Student/Frontpage'
 import StudentComplaint from '../src/Component/Student/Complaint'
 import ContactPage from './Component/Student/ContactPage';
 import AccountantDashboard from '../src/Component/Accountant/Dashboard'
+import ComplainStatus from '../src/Component/Student/Complainstatus'
 function App() {
   return (
     <div className="App">
@@ -17,6 +18,7 @@ function App() {
           <Route path="/complain" element={<StudentComplaint/>}/>
           <Route path='/contact' element={<ContactPage/>}/>
           <Route path="/accountant" element={<AccountantDashboard/>}/>
+          <Route path="/complainstatus" element={<ComplainStatus/>}/>
         </Routes>
       </Router>
     </div>

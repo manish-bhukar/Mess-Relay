@@ -1,4 +1,3 @@
-// models/Complaint.js
 const mongoose = require("mongoose");
 
 const complaintSchema = new mongoose.Schema({
@@ -11,9 +10,13 @@ const complaintSchema = new mongoose.Schema({
     required: true,
   },
   file: {
-    type: String, 
-    required:true
+    type: String,
+    required: true,
     // Store the file path
+  },
+  isResolved: {
+    type: Boolean,
+    default: false, // Default value set to false
   },
   createdAt: {
     type: Date,

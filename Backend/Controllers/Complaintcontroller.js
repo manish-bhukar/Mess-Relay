@@ -36,18 +36,14 @@ const submitComplaint = async (req, res) => {
     res.status(500).send("Failed to submit complaint. Please try again later.");
   }
 };
-
- const fetchComplaints= async(req, res) => {
-    try {
-      // Fetch all complaints from the database
-      const complaints = await Complaint.find();
-
-      res.status(200).json({ complaints });
-    } catch (error) {
-      console.error('Error fetching complaints:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+const getAllComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find();
+    res.json(complaints);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
+};
  
     const resolveComplaint=async (req, res) => {
     try {
@@ -68,6 +64,6 @@ const submitComplaint = async (req, res) => {
 
 module.exports = {
   submitComplaint,
-  fetchComplaints,
-  resolveComplaint
+  resolveComplaint,
+  getAllComplaints
 };
