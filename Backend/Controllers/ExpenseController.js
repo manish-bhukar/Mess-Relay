@@ -19,10 +19,10 @@ const saveExpense = async (req, res) => {
   const { month, vegetable, fruits, provisions, other, total, year } = req.body;
   const userId = req.user._id;
 
-  // Check for required fields
-  if (!month || !vegetable || !fruits || !provisions || !other || !total || !year) {
-    return res.status(400).json({ error: 'Please fill in all fields' });
-  }
+  // // Check for required fields
+  // if (!month || !vegetable || !fruits || !provisions || !other || !total || !year) {
+  //   return res.status(400).json({ error: 'Please fill in all fields' });
+  // }
 
   try {
     const newExpense = new Expense({
@@ -55,9 +55,9 @@ const editExpense = async (req, res) => {
   }
 
   // Check for required fields
-  if (!year || !month || !categories || !total) {
-    return res.status(400).json({ error: 'Please fill in all fields' });
-  }
+  // if (!year || !month || !categories || !total) {
+  //   return res.status(400).json({ error: 'Please fill in all fields' });
+  // }
 
   try {
     const updatedExpense = await Expense.findByIdAndUpdate(

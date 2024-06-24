@@ -3,36 +3,38 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Expenses = ({ initialYear }) => {
-  const [selectedYear, setSelectedYear] = useState(initialYear || new Date().getFullYear());
+const Expenses = () => {
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [expenses, setExpenses] = useState([]);
   const [editedExpense, setEditedExpense] = useState({
     month: '',
-    vegetable: 0,
-    fruits: 0,
-    provisions: 0,
-    other: 0,
+    vegetable: '',
+    fruits: '',
+    provisions: '',
+    other: '',
     total: 0,
     year: selectedYear,
   });
   const [loading, setLoading] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
+  const [yearInput, setYearInput] = useState('');
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    fetchExpenses(selectedYear);
-  }, [selectedYear]);
-
-  const fetchExpenses = async (year) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:5000/expenses/${year}`);
-      setExpenses(response.data);
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-    } finally {
-      setLoading(false);
+    // Set the authorization header from localStorage
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
-  };
+    fetchExpenses(selectedYear);
+  }, []);
+
+  useEffect(() => {
+    if (!initialLoad) {
+      fetchExpenses(selectedYear);
+    }
+    setInitialLoad(false);
+  }, [selectedYear]);
 
   const handleInputChange = (field, value) => {
     setEditedExpense({
@@ -47,10 +49,10 @@ const Expenses = ({ initialYear }) => {
       toast.success(response.data.message); // Show success message from backend
       setEditedExpense({
         month: '',
-        vegetable: 0,
-        fruits: 0,
-        provisions: 0,
-        other: 0,
+        vegetable: '',
+        fruits: '',
+        provisions: '',
+        other: '',
         total: 0,
         year: selectedYear,
       });
@@ -82,9 +84,39 @@ const Expenses = ({ initialYear }) => {
   };
 
   const handleYearInputChange = (event) => {
-    const year = parseInt(event.target.value);
-    setSelectedYear(year);
+    setYearInput(event.target.value.trim()); // Trim any extra whitespace
   };
+
+  const handleSelectYear = () => {
+    if (isValidYear(yearInput)) {
+      setSelectedYear(yearInput);
+      fetchExpenses(selectedYear);
+    } else {
+      toast.error('Please enter a valid year.');
+    }
+  };
+
+  const isValidYear = (year) => {
+    // Basic validation: numeric and within a reasonable range
+    const currentYear = new Date().getFullYear();
+    const parsedYear = parseInt(year, 10);
+    return !isNaN(parsedYear) && parsedYear >= currentYear - 10 && parsedYear <= currentYear + 10;
+  };
+
+  const fetchExpenses = async (year) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:5000/expenses/${year}`);
+      setExpenses(response.data);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter expenses for the currently selected year
+  const filteredExpenses = expenses.filter(expense => expense.year === selectedYear);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -93,53 +125,59 @@ const Expenses = ({ initialYear }) => {
       <div className="flex justify-end mb-4">
         <label className="text-gray-500">Enter Year:</label>
         <input
-          type="number"
-          value={selectedYear}
+          type="text"
+          value={yearInput}
           onChange={handleYearInputChange}
-          className="px-2 py-1 ml-2 border rounded-md w-20"
-          placeholder="Enter year"
+          className="px-2 py-1 ml-2 border rounded-md w-28"
+          placeholder="YYYY"
         />
+        <button
+          onClick={handleSelectYear}
+          className="px-4 py-2 ml-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+        >
+          Select Year
+        </button>
       </div>
 
       {/* Add/Edit Expense Section */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Manage Expenses</h2>
         {!editingExpense && (
-          <div className="flex items-center mb-2">
+          <div className="flex items-center mb-2 space-x-2">
             <input
               type="text"
               value={editedExpense.month}
               onChange={(e) => handleInputChange('month', e.target.value)}
               placeholder="Month"
-              className="px-2 py-1 border rounded-md mr-2 w-24"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editedExpense.vegetable}
-              onChange={(e) => handleInputChange('vegetable', parseFloat(e.target.value))}
+              onChange={(e) => handleInputChange('vegetable', e.target.value)}
               placeholder="Vegetable"
-              className="px-2 py-1 border rounded-md mr-2 w-20"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editedExpense.fruits}
-              onChange={(e) => handleInputChange('fruits', parseFloat(e.target.value))}
+              onChange={(e) => handleInputChange('fruits', e.target.value)}
               placeholder="Fruits"
-              className="px-2 py-1 border rounded-md mr-2 w-20"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editedExpense.provisions}
-              onChange={(e) => handleInputChange('provisions', parseFloat(e.target.value))}
+              onChange={(e) => handleInputChange('provisions', e.target.value)}
               placeholder="Provisions"
-              className="px-2 py-1 border rounded-md mr-2 w-20"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editedExpense.other}
-              onChange={(e) => handleInputChange('other', parseFloat(e.target.value))}
+              onChange={(e) => handleInputChange('other', e.target.value)}
               placeholder="Other"
-              className="px-2 py-1 border rounded-md mr-2 w-20"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <button
               onClick={handleAddExpense}
@@ -150,49 +188,49 @@ const Expenses = ({ initialYear }) => {
           </div>
         )}
         {editingExpense && (
-          <div className="flex items-center mb-2">
+          <div className="flex items-center mb-2 space-x-2">
             <input
               type="text"
               value={editingExpense.month}
               onChange={(e) => setEditingExpense({ ...editingExpense, month: e.target.value })}
               placeholder="Month"
-              className="px-2 py-1 border rounded-md mr-2 w-24"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editingExpense.vegetable}
               onChange={(e) =>
-                setEditingExpense({ ...editingExpense, vegetable: parseFloat(e.target.value) })
+                setEditingExpense({ ...editingExpense, vegetable: e.target.value })
               }
               placeholder="Vegetable"
-              className="px-2 py-1 border rounded-md mr-2 w-25"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editingExpense.fruits}
               onChange={(e) =>
-                setEditingExpense({ ...editingExpense, fruits: parseFloat(e.target.value) })
+                setEditingExpense({ ...editingExpense, fruits: e.target.value })
               }
               placeholder="Fruits"
-              className="px-2 py-1 border rounded-md mr-2 w-25"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editingExpense.provisions}
               onChange={(e) =>
-                setEditingExpense({ ...editingExpense, provisions: parseFloat(e.target.value) })
+                setEditingExpense({ ...editingExpense, provisions: e.target.value })
               }
               placeholder="Provisions"
-              className="px-2 py-1 border rounded-md mr-2 w-25"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <input
-              type="number"
+              type="text"
               value={editingExpense.other}
               onChange={(e) =>
-                setEditingExpense({ ...editingExpense, other: parseFloat(e.target.value) })
+                setEditingExpense({ ...editingExpense, other: e.target.value })
               }
               placeholder="Other"
-              className="px-2 py-1 border rounded-md mr-2 w-25"
+              className="px-2 py-1 border rounded-md w-32"
             />
             <button
               onClick={handleEditExpense}
@@ -236,7 +274,7 @@ const Expenses = ({ initialYear }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {expenses.map((expense, index) => (
+          {filteredExpenses.map((expense, index) => (
             <tr key={index}>
               <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {expense.month}
