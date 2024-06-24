@@ -6,6 +6,7 @@ const userRoutes = require('./Routes/UserRoute.js');
 const complaintsRoutes=require('./Routes/ComplaintRoute.js');
 const expenseRoutes=require('./Routes/ExpenseRoute.js')
 const noticeRoute=require('./Routes/noticeroutes.js');
+const messMenuRoutes=require('./Controllers/MessMenuController.js');
 const cors = require('cors');
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(fileUpload());
 app.use("/uploads",express.static("uploads"));
 app.use("/notices",noticeRoute);
+app.use("/messmenu",messMenuRoutes)
 app.use('/user', userRoutes);
 app.use("/complaints", complaintsRoutes);
 app.use('/expenses', expenseRoutes);

@@ -10,6 +10,7 @@ import ComplainStatus from "../src/Component/Student/Complainstatus";
 import ChiefWardenDashboard from "../src/Component/ChiefWarden/Dashboard.js";
 import AddNotice from "./Component/ChiefWarden/Notice.js";
 import ProtectedRoute from "./Component/ProtectedRoute.js";
+import MessMenu from "./Component//Student/MessMenu.js";
 function App() {
   return (
     <div className="App">
@@ -39,6 +40,7 @@ function App() {
             </ProtectedRoute>} 
             />
           <Route path="/notice" element={<AddNotice />} />
+          <Route path="mess-menu" element={<MessMenu/>} />
         </Routes>
       </Router>
     </div>
