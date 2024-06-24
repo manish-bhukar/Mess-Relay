@@ -1,10 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function DashboardMain() {
   const [selectedMenuItem, setSelectedMenuItem] = useState("Dashboard");
   const [userName, setUserName] = useState("John Doe");
+  const [notices, setNotices] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const fetchNotices = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/notices/getnotice');
+      setNotices(response.data);
+    } catch (error) {
+      console.error('Error fetching notices:', error);
+    }
+  };
 
   const handleMenuItemClick = (menuItem) => {
     setSelectedMenuItem(menuItem);
@@ -31,12 +46,6 @@ function DashboardMain() {
     "Rules",
     "Mnnit Alld",
     "Contact",
-  ];
-
-  const notices = [
-    { id: 1, title: "Notice 1", url: "/path/to/notice1.pdf" },
-    { id: 2, title: "Notice 2", url: "/path/to/notice2.pdf" },
-    { id: 3, title: "Notice 3", url: "/path/to/notice3.pdf" },
   ];
 
   return (
@@ -93,19 +102,24 @@ function DashboardMain() {
       {/* Notices Section */}
       <div className="bg-gray-800 w-64 flex flex-col h-full p-4">
         <h2 className="text-xl font-bold mb-4">Notices</h2>
-        <ul className="flex-1">
-          {notices.map((notice) => (
-            <li key={notice.id} className="mb-4 flex justify-between items-center">
-              <span>{notice.title}</span>
-              <a
-                href={notice.url}
-                download
-                className="text-blue-400 hover:underline"
-              >
-                Download
-              </a>
-            </li>
-          ))}
+        <ul className="flex-1 overflow-y-auto">
+          {notices.length === 0 ? (
+            <p className="text-gray-500">No notices available.</p>
+          ) : (
+            notices.map((notice) => (
+              <li key={notice._id} className="mb-4 flex justify-between items-center">
+                <span>{notice.title}</span>
+                <a
+                  href={`http://localhost:5000${notice.file}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  Open Notice
+                </a>
+              </li>
+            ))
+          )}
         </ul>
         <button
           onClick={handleLogout}
