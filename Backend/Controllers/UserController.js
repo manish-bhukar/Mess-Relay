@@ -48,7 +48,7 @@ const loginUser = async (req, res) => {
     // Assuming user.position is stored in the User document
     const position = user.position; // Replace with the actual path to the position field in your User schema
 
-    res.status(200).json({ message: 'Login successful!', token, position });
+    res.status(200).json({ message: 'Login successful!', token, position,userId:user._id });
   } catch (error) {
     console.error('Error during user login:', error);
     res.status(500).json({ message: 'Server error' });

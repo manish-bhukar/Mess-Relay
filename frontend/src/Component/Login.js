@@ -35,10 +35,11 @@ const Login = () => {
 
       // Set token in Authorization header for future requests
       axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-
+        //  console.log(response.data)
+          console.log(response.data.userId)
       // Save token and user info in localStorage
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userId", response.data._id);
+      localStorage.setItem("userId", response.data.userId);
       localStorage.setItem("emailId", response.data.email);
 
       toast.success(response.data.message);

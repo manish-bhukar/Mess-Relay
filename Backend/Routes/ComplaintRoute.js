@@ -8,5 +8,13 @@ router.post("/", complaintController.submitComplaint);
 // GET /api/complaints/getcomplaints - Get all complaints
 router.get("/getcomplaints", complaintController.getAllComplaints);
 
-module.exports = router;
+// PUT /api/complaints/:complaintId/resolve - Resolve a complaint by ID
+router.put("/:complaintId/resolve", complaintController.resolveComplaint);
 
+// POST /api/complaints/:complaintId/like - Like a complaint by ID
+router.post("/:complaintId/like", complaintController.likeComplaint);
+
+// POST /api/complaints/:complaintId/dislike - Dislike a complaint by ID
+router.post("/:complaintId/dislike", complaintController.dislikeComplaint);
+
+module.exports = router;

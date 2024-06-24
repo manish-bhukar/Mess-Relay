@@ -12,16 +12,17 @@ const complaintSchema = new mongoose.Schema({
   file: {
     type: String,
     required: true,
-    // Store the file path
   },
   isResolved: {
     type: Boolean,
-    default: false, // Default value set to false
+    default: false,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
+  dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
 });
 
 module.exports = mongoose.model("Complaint", complaintSchema);
