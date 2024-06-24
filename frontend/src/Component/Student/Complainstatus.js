@@ -3,9 +3,14 @@ import axios from 'axios';
 
 const App = () => {
   const [complaints, setComplaints] = useState([]);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     fetchComplaints();
+    const storedRole = localStorage.getItem('position');
+    if (storedRole) {
+      setRole(storedRole);
+    }
   }, []);
 
   const fetchComplaints = async () => {
@@ -27,7 +32,7 @@ const App = () => {
     try {
       const response = await axios.post(`http://localhost:5000/complaints/${complaintId}/like`, { studentId });
       const updatedComplaints = complaints.map(complaint =>
-        complaint._id === complaintId ? { ...complaint, liked: true, successMessage: response.data.message } : complaint
+        complaint._id === complaintId ? { ...complaint, liked: true, likes: complaint.likes + 1, successMessage: response.data.message } : complaint
       );
       setComplaints(updatedComplaints);
 
@@ -58,7 +63,7 @@ const App = () => {
     try {
       const response = await axios.post(`http://localhost:5000/complaints/${complaintId}/dislike`, { studentId });
       const updatedComplaints = complaints.map(complaint =>
-        complaint._id === complaintId ? { ...complaint, disliked: true, successMessage: response.data.message } : complaint
+        complaint._id === complaintId ? { ...complaint, disliked: true, dislikes: complaint.dislikes + 1, successMessage: response.data.message } : complaint
       );
       setComplaints(updatedComplaints);
 
@@ -122,23 +127,34 @@ const App = () => {
                   <strong>Created At:</strong> {new Date(complaint.createdAt).toLocaleString()}
                 </p>
 
-                {/* Like and Dislike buttons */}
-                <div className="flex mt-4 space-x-4">
-                  <button
-                    className={`bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.liked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => !complaint.liked && handleLike(complaint._id)}
-                    disabled={complaint.liked}
-                  >
-                    {complaint.liked ? 'Liked' : 'Like'}
-                  </button>
-                  <button
-                    className={`bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.disliked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => !complaint.disliked && handleDislike(complaint._id)}
-                    disabled={complaint.disliked}
-                  >
-                    {complaint.disliked ? 'Disliked' : 'Dislike'}
-                  </button>
-                </div>
+                {/* Display Likes and Dislikes if not student */}
+                {role !== 'student' && (
+                  <div className="text-sm text-gray-700 mt-2">
+                    <strong>Likes:</strong> {complaint.likes.length}
+                    <br />
+                    <strong>Dislikes:</strong> {complaint.dislikes.length}
+                  </div>
+                )}
+
+                {/* Like and Dislike buttons (if user is student) */}
+                {role === 'student' && (
+                  <div className="flex mt-4 space-x-4">
+                    <button
+                      className={`bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.liked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => !complaint.liked && handleLike(complaint._id)}
+                      disabled={complaint.liked}
+                    >
+                      {complaint.liked ? 'Liked' : 'Like'}
+                    </button>
+                    <button
+                      className={`bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.disliked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      onClick={() => !complaint.disliked && handleDislike(complaint._id)}
+                      disabled={complaint.disliked}
+                    >
+                      {complaint.disliked ? 'Disliked' : 'Dislike'}
+                    </button>
+                  </div>
+                )}
 
                 {/* Success and Error Messages */}
                 {complaint.successMessage && (
