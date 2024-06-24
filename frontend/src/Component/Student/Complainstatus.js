@@ -3,8 +3,6 @@ import axios from 'axios';
 
 const App = () => {
   const [complaints, setComplaints] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     fetchComplaints();
@@ -28,13 +26,30 @@ const App = () => {
     const studentId = localStorage.getItem('userId');
     try {
       const response = await axios.post(`http://localhost:5000/complaints/${complaintId}/like`, { studentId });
-      setSuccessMessage(response.data.message);
-      setErrorMessage('');
-      fetchComplaints(); // Refresh complaints after liking
+      const updatedComplaints = complaints.map(complaint =>
+        complaint._id === complaintId ? { ...complaint, liked: true, successMessage: response.data.message } : complaint
+      );
+      setComplaints(updatedComplaints);
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setComplaints(complaints.map(complaint =>
+          complaint._id === complaintId ? { ...complaint, successMessage: '' } : complaint
+        ));
+      }, 5000);
     } catch (error) {
       console.error('Error liking complaint:', error);
-      setErrorMessage('Failed to like complaint. Please try again.');
-      setSuccessMessage('');
+      const updatedComplaints = complaints.map(complaint =>
+        complaint._id === complaintId ? { ...complaint, errorMessage: 'Failed to like complaint. Please try again.' } : complaint
+      );
+      setComplaints(updatedComplaints);
+
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setComplaints(complaints.map(complaint =>
+          complaint._id === complaintId ? { ...complaint, errorMessage: '' } : complaint
+        ));
+      }, 5000);
     }
   };
 
@@ -42,13 +57,30 @@ const App = () => {
     const studentId = localStorage.getItem('userId');
     try {
       const response = await axios.post(`http://localhost:5000/complaints/${complaintId}/dislike`, { studentId });
-      setSuccessMessage(response.data.message);
-      setErrorMessage('');
-      fetchComplaints(); // Refresh complaints after disliking
+      const updatedComplaints = complaints.map(complaint =>
+        complaint._id === complaintId ? { ...complaint, disliked: true, successMessage: response.data.message } : complaint
+      );
+      setComplaints(updatedComplaints);
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setComplaints(complaints.map(complaint =>
+          complaint._id === complaintId ? { ...complaint, successMessage: '' } : complaint
+        ));
+      }, 5000);
     } catch (error) {
       console.error('Error disliking complaint:', error);
-      setErrorMessage('Failed to dislike complaint. Please try again.');
-      setSuccessMessage('');
+      const updatedComplaints = complaints.map(complaint =>
+        complaint._id === complaintId ? { ...complaint, errorMessage: 'Failed to dislike complaint. Please try again.' } : complaint
+      );
+      setComplaints(updatedComplaints);
+
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setComplaints(complaints.map(complaint =>
+          complaint._id === complaintId ? { ...complaint, errorMessage: '' } : complaint
+        ));
+      }, 5000);
     }
   };
 
@@ -93,25 +125,27 @@ const App = () => {
                 {/* Like and Dislike buttons */}
                 <div className="flex mt-4 space-x-4">
                   <button
-                    className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-md"
-                    onClick={() => handleLike(complaint._id)}
+                    className={`bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.liked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => !complaint.liked && handleLike(complaint._id)}
+                    disabled={complaint.liked}
                   >
-                    Like
+                    {complaint.liked ? 'Liked' : 'Like'}
                   </button>
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-md"
-                    onClick={() => handleDislike(complaint._id)}
+                    className={`bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-md ${complaint.disliked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => !complaint.disliked && handleDislike(complaint._id)}
+                    disabled={complaint.disliked}
                   >
-                    Dislike
+                    {complaint.disliked ? 'Disliked' : 'Dislike'}
                   </button>
                 </div>
 
                 {/* Success and Error Messages */}
-                {successMessage && (
-                  <p className="text-green-600 mt-2">{successMessage}</p>
+                {complaint.successMessage && (
+                  <p className="text-green-600 mt-2">{complaint.successMessage}</p>
                 )}
-                {errorMessage && (
-                  <p className="text-red-600 mt-2">{errorMessage}</p>
+                {complaint.errorMessage && (
+                  <p className="text-red-600 mt-2">{complaint.errorMessage}</p>
                 )}
               </div>
             ))

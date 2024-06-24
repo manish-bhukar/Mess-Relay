@@ -80,9 +80,18 @@ const likeComplaint = async (req, res) => {
       // Student has already liked this complaint
       return res.status(400).json({ message: 'You have already liked this complaint' });
     }
+
+    if (complaint.dislikes.includes(studentId)) {
+      // Remove from dislikes if already disliked
+      complaint.dislikes = complaint.dislikes.filter(id => id.toString() !== studentId);
+    }
+
     const updatedComplaint = await Complaint.findByIdAndUpdate(
       complaintId,
-      { $addToSet: { likes: studentId } }, // Using $addToSet to add unique studentId to likes array
+      { 
+        $addToSet: { likes: studentId }, // Using $addToSet to add unique studentId to likes array
+        $pull: { dislikes: studentId } // Remove studentId from dislikes array
+      },
       { new: true }
     );
 
@@ -90,12 +99,13 @@ const likeComplaint = async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
-    res.status(200).json({ message: 'Complaint liked successfully', complaint });
+    res.status(200).json({ message: 'Complaint liked successfully', complaint: updatedComplaint });
   } catch (error) {
     console.error('Error liking complaint:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 const dislikeComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -124,6 +134,7 @@ const dislikeComplaint = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+;
 
 module.exports = {
   submitComplaint,
