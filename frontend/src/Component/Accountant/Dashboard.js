@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Expenses from './Expenses'; // Import Expenses sub-component
 import Notices from './Notices'; // Import Notices sub-component
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState('expenses');
   const [expenses, setExpenses] = useState([]);
+  const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (selectedMenuItem === 'expenses') {
       fetchExpenses();
+    } else if (selectedMenuItem === 'notices') {
+      fetchNotices();
     }
   }, [selectedMenuItem]);
 
@@ -20,6 +23,10 @@ const Dashboard = () => {
     setSelectedMenuItem(menuItem);
     if (menuItem === 'all-complaints') {
       navigate('/complainstatus');
+    } else if (menuItem === 'mess-menu') {
+      navigate('/mess-menu');
+    } else if (menuItem === 'notices') {
+      fetchNotices();
     }
   };
 
@@ -35,17 +42,26 @@ const Dashboard = () => {
     }
   };
 
+  const fetchNotices = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:5000/notices/getnotices');
+      setNotices(response.data);
+    } catch (error) {
+      console.error('Error fetching notices:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleExpenseUpdate = async (updatedExpense) => {
     setLoading(true);
     try {
       if (updatedExpense._id) {
-        // Update existing expense
         await axios.put(`http://localhost:5000/expenses/${updatedExpense._id}`, updatedExpense);
       } else {
-        // Create new expense
         await axios.post('http://localhost:5000/expenses/', updatedExpense);
       }
-      // Refetch expenses after update
       fetchExpenses();
     } catch (error) {
       console.error('Error updating expense:', error);
@@ -55,7 +71,6 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    // Implement your logout logic here
     console.log('Logging out...');
     navigate('/login');
   };
@@ -71,8 +86,9 @@ const Dashboard = () => {
         expenses={expenses}
         onExpenseUpdate={handleExpenseUpdate}
         loading={loading}
+        notices={notices}
         handleLogout={handleLogout}
-        setLoading={setLoading} // Pass setLoading to MainContent
+        setLoading={setLoading} // Pass setLoading function to MainContent
       />
     </div>
   );
@@ -89,11 +105,7 @@ const Sidebar = ({ selectedMenuItem, handleMenuItemClick }) => {
       <ul>
         <MenuItem text="Expenses" isSelected={selectedMenuItem === 'expenses'} onClick={() => handleMenuItemClick('expenses')} />
         <MenuItem text="Mess Menu" isSelected={selectedMenuItem === 'mess-menu'} onClick={() => handleMenuItemClick('mess-menu')} />
-        <MenuItem
-          text="All Complaints"
-          isSelected={selectedMenuItem === 'all-complaints'}
-          onClick={() => handleMenuItemClick('all-complaints')}
-        />
+        <MenuItem text="All Complaints" isSelected={selectedMenuItem === 'all-complaints'} onClick={() => handleMenuItemClick('all-complaints')} />
         <MenuItem text="Notices" isSelected={selectedMenuItem === 'notices'} onClick={() => handleMenuItemClick('notices')} />
       </ul>
     </div>
@@ -112,7 +124,7 @@ const MenuItem = ({ text, isSelected, onClick }) => {
 };
 
 // MainContent Component
-const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, handleLogout, setLoading }) => {
+const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, handleLogout, setLoading }) => {
   return (
     <div className="flex-1 bg-gray-100 p-8">
       {/* Logout Button */}
@@ -131,19 +143,20 @@ const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, han
         expenses={expenses}
         onExpenseUpdate={onExpenseUpdate}
         loading={loading}
-        setLoading={setLoading} // Pass setLoading to MainContentArea
+        notices={notices}
+        setLoading={setLoading} // Pass setLoading function to MainContentArea
       />
     </div>
   );
 };
 
 // MainContentArea Component
-const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, setLoading }) => {
+const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, setLoading }) => {
   return (
     <div>
       {/* Conditional Rendering based on selectedMenuItem */}
       {selectedMenuItem === 'expenses' && <Expenses expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />}
-      {selectedMenuItem === 'notices' && <Notices loading={loading} setLoading={setLoading} />} {/* Render Notices component */}
+      {selectedMenuItem === 'notices' && <Notices notices={notices} setLoading={setLoading} />} {/* Render Notices component */}
       {/* Add other conditional rendering based on selectedMenuItem */}
     </div>
   );
