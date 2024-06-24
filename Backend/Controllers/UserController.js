@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const registerUser = async (req, res) => {
-  const { name, email, password, position } = req.body;
+  const { name, email, password, position, hostel, registrationNumber } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -14,7 +14,15 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 8);
 
-    const newUser = new User({ name, email, password: hashedPassword, position });
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      position,
+      hostel, // Save hostel if position is 'student'
+      registrationNumber: position === 'student' ? registrationNumber : undefined, // Save reg. number if position is 'student'
+    });
+
     await newUser.save();
 
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
@@ -27,6 +35,7 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -48,13 +57,12 @@ const loginUser = async (req, res) => {
     // Assuming user.position is stored in the User document
     const position = user.position; // Replace with the actual path to the position field in your User schema
 
-    res.status(200).json({ message: 'Login successful!', token, position,userId:user._id });
+    res.status(200).json({ message: 'Login successful!', token, position, userId: user._id });
   } catch (error) {
     console.error('Error during user login:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 module.exports = {
   registerUser,

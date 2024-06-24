@@ -9,6 +9,8 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [position, setPosition] = useState(""); // New state for position
+  const [hostel, setHostel] = useState(""); // New state for hostel
+  const [registrationNumber, setRegistrationNumber] = useState(""); // New state for registration number
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +25,8 @@ export default function Signup() {
         email,
         password,
         position,
+        hostel,
+        registrationNumber, // Include registration number in the POST request
       }, {
         headers: {
           "Content-Type": "application/json",
@@ -118,6 +122,54 @@ export default function Signup() {
                   <option value="chief-warden">Chief Warden</option>
                 </select>
               </div>
+
+              {/* Hostel */}
+              
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="hostel"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Hostel
+                  </label>
+                  <select
+                    id="hostel"
+                    name="hostel"
+                    required
+                    value={hostel}
+                    onChange={(e) => setHostel(e.target.value)}
+                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="" disabled>Select hostel</option>
+                    <option value="svbh">SVBH</option>
+                    <option value="raman-hostel">Raman Hostel</option>
+                    <option value="new-hostel">New Hostel</option>
+                  </select>
+                </div>
+              
+
+              {/* Registration Number (only for students) */}
+              {position === "student" && (
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="registration-number"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Registration Number
+                  </label>
+                  <input
+                    id="registration-number"
+                    name="registration-number"
+                    type="text"
+                    autoComplete="off"
+                    required
+                    value={registrationNumber}
+                    onChange={(e) => setRegistrationNumber(e.target.value)}
+                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Enter registration number"
+                  />
+                </div>
+              )}
 
               {/* Password */}
               <div className="flex flex-col">

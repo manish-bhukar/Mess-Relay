@@ -18,9 +18,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/studentmain" element={<StudentDashboard />} />
-          <Route path="/complain" element={<StudentComplaint />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/studentmain" element={
+            <ProtectedRoute><StudentDashboard /></ProtectedRoute>
+            } />
+          <Route path="/complain" element={
+            <ProtectedRoute><StudentComplaint /></ProtectedRoute>
+            } />
+          <Route path="/contact" element={
+            <ProtectedRoute><ContactPage /></ProtectedRoute>
+            } />
           <Route
             path="/accountant"
             element={
@@ -39,8 +45,12 @@ function App() {
             <ChiefWardenDashboard />
             </ProtectedRoute>} 
             />
-          <Route path="/notice" element={<AddNotice />} />
-          <Route path="mess-menu" element={<MessMenu/>} />
+          <Route path="/notice" element={
+            <ProtectedRoute><AddNotice /></ProtectedRoute>
+            } />
+          <Route path="mess-menu" element={
+            <ProtectedRoute><MessMenu/></ProtectedRoute>
+            } />
         </Routes>
       </Router>
     </div>

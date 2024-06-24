@@ -34,6 +34,9 @@ function DashboardMain() {
 
   const handleLogout = () => {
     // Logic for logging out
+    localStorage.removeItem('position');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     navigate("/login");
   };
 

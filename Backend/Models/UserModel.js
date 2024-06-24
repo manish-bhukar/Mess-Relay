@@ -23,6 +23,17 @@ const UserSchema = new mongoose.Schema({
     enum: ['student', 'accountant', 'chief-warden'],
     required: true,
   },
+  hostel: {
+    type: String,
+    enum: ['svbh', 'raman hostel', 'new hostel', 'new-hostel'], // Update enum values here
+   
+  },
+  registrationNumber: {
+    type: String,
+    required: function () {
+      return this.position === 'student'; // Required only if position is 'student'
+    },
+  },
 }, {
   timestamps: true,
 });
