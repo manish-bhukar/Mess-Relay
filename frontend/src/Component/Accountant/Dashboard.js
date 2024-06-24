@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Expenses from './Expenses'; // Import Expenses sub-component
+import Notices from './Notices'; // Import Notices sub-component
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -10,8 +11,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchExpenses();
-  }, []);
+    if (selectedMenuItem === 'expenses') {
+      fetchExpenses();
+    }
+  }, [selectedMenuItem]);
 
   const handleMenuItemClick = (menuItem) => {
     setSelectedMenuItem(menuItem);
@@ -69,6 +72,7 @@ const Dashboard = () => {
         onExpenseUpdate={handleExpenseUpdate}
         loading={loading}
         handleLogout={handleLogout}
+        setLoading={setLoading} // Pass setLoading to MainContent
       />
     </div>
   );
@@ -108,7 +112,7 @@ const MenuItem = ({ text, isSelected, onClick }) => {
 };
 
 // MainContent Component
-const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, handleLogout }) => {
+const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, handleLogout, setLoading }) => {
   return (
     <div className="flex-1 bg-gray-100 p-8">
       {/* Logout Button */}
@@ -122,17 +126,24 @@ const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, han
       </div>
 
       {/* Main Content Area */}
-      <MainContentArea selectedMenuItem={selectedMenuItem} expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />
+      <MainContentArea
+        selectedMenuItem={selectedMenuItem}
+        expenses={expenses}
+        onExpenseUpdate={onExpenseUpdate}
+        loading={loading}
+        setLoading={setLoading} // Pass setLoading to MainContentArea
+      />
     </div>
   );
 };
 
 // MainContentArea Component
-const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading }) => {
+const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, setLoading }) => {
   return (
     <div>
       {/* Conditional Rendering based on selectedMenuItem */}
       {selectedMenuItem === 'expenses' && <Expenses expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />}
+      {selectedMenuItem === 'notices' && <Notices loading={loading} setLoading={setLoading} />} {/* Render Notices component */}
       {/* Add other conditional rendering based on selectedMenuItem */}
     </div>
   );
