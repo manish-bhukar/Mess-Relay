@@ -122,6 +122,7 @@ const App = () => {
                 </div>
                 <p className="text-sm text-gray-700 mt-2">
                   <strong>Resolved:</strong> {complaint.isResolved ? 'Yes' : 'No'}
+                  {complaint.isResolved?<p>Description: {complaint.resolutionDescription}</p>:""}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Created At:</strong> {new Date(complaint.createdAt).toLocaleString()}
