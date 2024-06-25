@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 
 const getExpensesByYear = async (req, res) => {
   const { year } = req.params;
-  const user= req.user;
-
+  const hostel=req.user.hostel;
+  console.log(hostel)
   try {
-    const expenses = await Expense.find({ hostel:user.hostel, year }); // Fetch expenses for the specific user and year
+    const expenses = await Expense.find({ hostel, year }); // Fetch expenses for the specific user and year
     res.json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -17,8 +17,8 @@ const getExpensesByYear = async (req, res) => {
 const saveExpense = async (req, res) => {
   const { month, categories, total, year } = req.body;
   const userId = req.user._id;
-  const hostelname = req.user.hostel; // Assuming hostelname is stored in req.user
-
+  const hostel = req.user.hostel; // Assuming hostelname is stored in req.user
+ 
   // Check for required fields
  
 
@@ -27,7 +27,7 @@ const saveExpense = async (req, res) => {
       user: userId,
       year,
       month,
-      hostelname, // Include hostelname in the expense document
+      hostel, // Include hostelname in the expense document
       categories: {
         vegetable: categories.vegetable || 0,
         fruits: categories.fruits || 0,

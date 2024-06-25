@@ -5,7 +5,7 @@ const expenseSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   year: { type: Number, required: true },
   month: { type: String, required: true },
-  hostelname: { type: String }, // Added hostelname field
+  hostel: { type: String }, // Added hostelname field
   categories: {
     vegetable: { type: Number, default: 0 },
     fruits: { type: Number, default: 0 },

@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
   },
   hostel: {
     type: String,
-    enum: ['svbh', 'raman hostel', 'new hostel', 'new-hostel'], // Update enum values here
+    enum: ['svbh', 'raman-hostel', 'new hostel', 'new-hostel'], // Update enum values here
    
   },
   registrationNumber: {
