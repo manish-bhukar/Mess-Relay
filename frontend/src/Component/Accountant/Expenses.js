@@ -1,303 +1,179 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const Expenses = () => {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [year, setYear] = useState('');
   const [expenses, setExpenses] = useState([]);
-  const [editedExpense, setEditedExpense] = useState({
-    month: '',
-    vegetable: '',
-    fruits: '',
-    provisions: '',
-    other: '',
-    total: 0,
-    year: selectedYear,
-  });
-  const [loading, setLoading] = useState(false);
-  const [editingExpense, setEditingExpense] = useState(null);
-  const [yearInput, setYearInput] = useState('');
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editedExpense, setEditedExpense] = useState({});
 
   useEffect(() => {
-    // Set the authorization header from localStorage
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-    fetchExpenses(selectedYear);
-  }, []);
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/expenses/${year}`);
+        setExpenses(response.data);
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+      }
+    };
 
-  useEffect(() => {
-    if (!initialLoad) {
-      fetchExpenses(selectedYear);
+    if (year) {
+      fetchExpenses();
     }
-    setInitialLoad(false);
-  }, [selectedYear]);
+  }, [year]);
 
-  const handleInputChange = (field, value) => {
-    setEditedExpense({
-      ...editedExpense,
-      [field]: value,
-    });
+  const handleEdit = (expense) => {
+    setEditMode(true);
+    setEditedExpense({ ...expense });
   };
 
-  const handleAddExpense = async () => {
+  const handleSaveEdit = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/expenses/', editedExpense);
-      toast.success(response.data.message); // Show success message from backend
-      setEditedExpense({
-        month: '',
-        vegetable: '',
-        fruits: '',
-        provisions: '',
-        other: '',
-        total: 0,
-        year: selectedYear,
+      const response = await axios.put(`http://localhost:5000/expenses/${editedExpense._id}`, editedExpense);
+      console.log('Expense updated:', response.data);
+
+      const updatedExpenses = expenses.map(exp => {
+        if (exp._id === editedExpense._id) {
+          return editedExpense;
+        }
+        return exp;
       });
-      fetchExpenses(selectedYear); // Refresh expenses after adding
-    } catch (error) {
-      console.error('Error adding expense:', error);
-      toast.error('Failed to add expense.');
-    }
-  };
+      setExpenses(updatedExpenses);
 
-  const handleEditExpense = async () => {
-    try {
-      const response = await axios.put(`http://localhost:5000/expenses/${editingExpense._id}`, editingExpense);
-      toast.success(response.data.message); // Show success message from backend
-      setEditingExpense(null);
-      fetchExpenses(selectedYear); // Refresh expenses after updating
+      setEditMode(false);
+      setEditedExpense({});
     } catch (error) {
       console.error('Error updating expense:', error);
-      toast.error('Failed to update expense.');
     }
   };
 
-  const handleStartEdit = (expense) => {
-    setEditingExpense(expense);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingExpense(null);
-  };
-
-  const handleYearInputChange = (event) => {
-    setYearInput(event.target.value.trim()); // Trim any extra whitespace
-  };
-
-  const handleSelectYear = () => {
-    if (isValidYear(yearInput)) {
-      setSelectedYear(yearInput);
-      fetchExpenses(selectedYear);
-    } else {
-      toast.error('Please enter a valid year.');
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (editMode) {
+      if (name === 'total') {
+        setEditedExpense({ ...editedExpense, total: value });
+      } else {
+        setEditedExpense({
+          ...editedExpense,
+          categories: {
+            ...editedExpense.categories,
+            [name]: value
+          }
+        });
+      }
     }
   };
-
-  const isValidYear = (year) => {
-    // Basic validation: numeric and within a reasonable range
-    const currentYear = new Date().getFullYear();
-    const parsedYear = parseInt(year, 10);
-    return !isNaN(parsedYear) && parsedYear >= currentYear - 10 && parsedYear <= currentYear + 10;
-  };
-
-  const fetchExpenses = async (year) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:5000/expenses/${year}`);
-      setExpenses(response.data);
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Filter expenses for the currently selected year
-  const filteredExpenses = expenses.filter(expense => expense.year === selectedYear);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <ToastContainer />
-      {/* Year Input */}
-      <div className="flex justify-end mb-4">
-        <label className="text-gray-500">Enter Year:</label>
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-semibold mb-4">Expenses for Year {year}</h2>
+      <div className="flex mb-4">
         <input
           type="text"
-          value={yearInput}
-          onChange={handleYearInputChange}
-          className="px-2 py-1 ml-2 border rounded-md w-28"
-          placeholder="YYYY"
+          placeholder="Enter year"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+          className="border border-gray-300 px-3 py-2 mr-2 w-1/2 focus:outline-none focus:border-blue-500 rounded-md"
         />
         <button
-          onClick={handleSelectYear}
-          className="px-4 py-2 ml-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+          onClick={() => setYear(year)}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none"
         >
-          Select Year
+          Search
         </button>
       </div>
 
-      {/* Add/Edit Expense Section */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Manage Expenses</h2>
-        {!editingExpense && (
-          <div className="flex items-center mb-2 space-x-2">
-            <input
-              type="text"
-              value={editedExpense.month}
-              onChange={(e) => handleInputChange('month', e.target.value)}
-              placeholder="Month"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editedExpense.vegetable}
-              onChange={(e) => handleInputChange('vegetable', e.target.value)}
-              placeholder="Vegetable"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editedExpense.fruits}
-              onChange={(e) => handleInputChange('fruits', e.target.value)}
-              placeholder="Fruits"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editedExpense.provisions}
-              onChange={(e) => handleInputChange('provisions', e.target.value)}
-              placeholder="Provisions"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editedExpense.other}
-              onChange={(e) => handleInputChange('other', e.target.value)}
-              placeholder="Other"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <button
-              onClick={handleAddExpense}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            >
-              Add Expense
-            </button>
-          </div>
-        )}
-        {editingExpense && (
-          <div className="flex items-center mb-2 space-x-2">
-            <input
-              type="text"
-              value={editingExpense.month}
-              onChange={(e) => setEditingExpense({ ...editingExpense, month: e.target.value })}
-              placeholder="Month"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editingExpense.vegetable}
-              onChange={(e) =>
-                setEditingExpense({ ...editingExpense, vegetable: e.target.value })
-              }
-              placeholder="Vegetable"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editingExpense.fruits}
-              onChange={(e) =>
-                setEditingExpense({ ...editingExpense, fruits: e.target.value })
-              }
-              placeholder="Fruits"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editingExpense.provisions}
-              onChange={(e) =>
-                setEditingExpense({ ...editingExpense, provisions: e.target.value })
-              }
-              placeholder="Provisions"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <input
-              type="text"
-              value={editingExpense.other}
-              onChange={(e) =>
-                setEditingExpense({ ...editingExpense, other: e.target.value })
-              }
-              placeholder="Other"
-              className="px-2 py-1 border rounded-md w-32"
-            />
-            <button
-              onClick={handleEditExpense}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
-            >
-              Save
-            </button>
-            <button
-              onClick={handleCancelEdit}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md ml-2 hover:bg-gray-700 focus:outline-none"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Display Expenses Table */}
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Month
-            </th>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Vegetables
-            </th>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Fruits
-            </th>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Provisions
-            </th>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Other
-            </th>
-            <th className="px-2 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Total
-            </th>
-            <th className="px-2 py-3 bg-gray-50"></th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {filteredExpenses.map((expense, index) => (
-            <tr key={index}>
-              <td className="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {expense.month}
-              </td>
-              <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{expense.categories.vegetable}</td>
-              <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{expense.categories.fruits}</td>
-              <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{expense.categories.provisions}</td>
-              <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{expense.categories.other}</td>
-              <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">{expense.total}</td>
-              <td className="px-2 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  onClick={() => handleStartEdit(expense)}
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
+      {expenses.length > 0 ? (
+        <div>
+          {expenses.map((expense) => (
+            <div key={expense._id} className="border border-gray-300 rounded-md p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p><strong>Month:</strong> {expense.month}</p>
+                </div>
+                <div>
+                  <p><strong>Vegetable:</strong> {expense.categories?.vegetable}</p>
+                </div>
+                <div>
+                  <p><strong>Fruits:</strong> {expense.categories?.fruits}</p>
+                </div>
+                <div>
+                  <p><strong>Provisions:</strong> {expense.categories?.provisions}</p>
+                </div>
+                <div>
+                  <p><strong>Other:</strong> {expense.categories?.other}</p>
+                </div>
+                <div>
+                  <p><strong>Total:</strong> {expense.total}</p>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                {editMode && editedExpense._id === expense._id ? (
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <input
+                      type="text"
+                      name="month"
+                      value={editedExpense.month || ""}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <input
+                      type="number"
+                      name="vegetable"
+                      value={editedExpense.categories?.vegetable || ""}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <input
+                      type="number"
+                      name="fruits"
+                      value={editedExpense.categories?.fruits || ""}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <input
+                      type="number"
+                      name="provisions"
+                      value={editedExpense.categories?.provisions || ""}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <input
+                      type="number"
+                      name="other"
+                      value={editedExpense.categories?.other || ""}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <input
+                      type="number"
+                      name="total"
+                      value={editedExpense.total || 0}
+                      onChange={handleChange}
+                      className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
+                    />
+                    <button
+                      onClick={handleSaveEdit}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none"
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleEdit(expense)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
-
-      {loading && <p className="mt-4 text-gray-500">Loading expenses...</p>}
+        </div>
+      ) : (
+        <p>No expenses found for the year {year}</p>
+      )}
     </div>
   );
 };

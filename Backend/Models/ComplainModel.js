@@ -17,6 +17,10 @@ const complaintSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  resolutionDescription: {
+    type: String,
+    default: "", // Set default value as an empty string
+  },
   createdAt: {
     type: Date,
     default: Date.now,

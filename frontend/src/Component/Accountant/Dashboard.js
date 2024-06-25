@@ -72,9 +72,9 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     console.log('Logging out...');
-    localStorage.removeItem('position');
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('position');
     navigate('/login');
   };
 

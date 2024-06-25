@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const complaintController = require("../controllers/complaintController");
-
+const complaintController = require("../controllers/complaintController.js");
+const {resolveComplaint}=require("../controllers/complaintController.js");
 // POST /api/complaints - Submit a new complaint
 router.post("/", complaintController.submitComplaint);
 
@@ -16,5 +16,5 @@ router.post("/:complaintId/like", complaintController.likeComplaint);
 
 // POST /api/complaints/:complaintId/dislike - Dislike a complaint by ID
 router.post("/:complaintId/dislike", complaintController.dislikeComplaint);
-
+router.put('/resolve/:id', resolveComplaint);
 module.exports = router;

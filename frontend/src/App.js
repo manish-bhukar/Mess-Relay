@@ -11,6 +11,7 @@ import ChiefWardenDashboard from "../src/Component/ChiefWarden/Dashboard.js";
 import AddNotice from "./Component/ChiefWarden/Notice.js";
 import ProtectedRoute from "./Component/ProtectedRoute.js";
 import MessMenu from "./Component//Student/MessMenu.js";
+import Messmenu from "./Component/ChiefWarden/MessMenu.js";
 function App() {
   return (
     <div className="App">
@@ -51,6 +52,9 @@ function App() {
           <Route path="mess-menu" element={
             <ProtectedRoute><MessMenu/></ProtectedRoute>
             } />
+            <Route path="messmenu" element={
+            <ProtectedRoute><Messmenu/></ProtectedRoute>
+            } />  
         </Routes>
       </Router>
     </div>

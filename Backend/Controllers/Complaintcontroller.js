@@ -46,22 +46,22 @@ const getAllComplaints = async (req, res) => {
   }
 };
 
-const resolveComplaint = async (req, res) => {
-  try {
-    const { complaintId } = req.params;
+// const resolveComplaint = async (req, res) => {
+//   try {
+//     const { complaintId } = req.params;
 
-    const updatedComplaint = await Complaint.findByIdAndUpdate(
-      complaintId,
-      { resolved: true, resolvedAt: new Date() },
-      { new: true }
-    );
+//     const updatedComplaint = await Complaint.findByIdAndUpdate(
+//       complaintId,
+//       { resolved: true, resolvedAt: new Date() },
+//       { new: true }
+//     );
 
-    res.status(200).json(updatedComplaint);
-  } catch (error) {
-    console.error('Error resolving complaint:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
+//     res.status(200).json(updatedComplaint);
+//   } catch (error) {
+//     console.error('Error resolving complaint:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// };
 const likeComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -105,6 +105,31 @@ const likeComplaint = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+const resolveComplaint = async (req, res) => {
+  const { id } = req.params;
+  const { resolutionDescription } = req.body;
+
+  try {
+    console.log({id});
+    const complaint = await Complaint.findById(id);
+    
+    if (!complaint) {
+      return res.status(404).json({ error: 'Complaint not found' });
+    }
+
+    complaint.resolutionDescription = resolutionDescription;
+    complaint.isResolved = true;
+
+    await complaint.save();
+
+    res.json(complaint);
+  } catch (error) {
+    console.error('Error resolving complaint:', error);
+    res.status(500).json({ error: 'Unable to resolve complaint' });
+  }
+};
+
 
 const dislikeComplaint = async (req, res) => {
   try {
