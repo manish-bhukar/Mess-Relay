@@ -16,7 +16,7 @@ const getExpensesByYear = async (req, res) => {
 };
 
 const saveExpense = async (req, res) => {
-  const { month, vegetable, fruits, provisions, other, total, year } = req.body;
+  const { month, categories, total, year } = req.body;
   const userId = req.user._id;
 
   // // Check for required fields
@@ -30,10 +30,10 @@ const saveExpense = async (req, res) => {
       year,
       month,
       categories: {
-        vegetable: vegetable || 0,
-        fruits: fruits || 0,
-        provisions: provisions || 0,
-        other: other || 0,
+        vegetable: categories.vegetable || 0,
+        fruits: categories.fruits || 0,
+        provisions: categories.provisions || 0,
+        other: categories.other || 0,
       },
       total,
     });

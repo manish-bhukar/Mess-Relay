@@ -3,12 +3,14 @@ import axios from 'axios';
 import Expenses from './Expenses'; // Import Expenses sub-component
 import Notices from './Notices'; // Import Notices sub-component
 import { useNavigate } from 'react-router-dom';
+import AddExpense from './AddExpense'; // Import AddExpenseForm component
 
 const Dashboard = () => {
   const [selectedMenuItem, setSelectedMenuItem] = useState('expenses');
   const [expenses, setExpenses] = useState([]);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showAddExpense, setShowAddExpense] = useState(false); // State to control visibility of add expense form
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +29,11 @@ const Dashboard = () => {
       navigate('/mess-menu');
     } else if (menuItem === 'notices') {
       fetchNotices();
+      setShowAddExpense(false); // Close Add Expense form if open
+    } else if (menuItem === 'add-expense') {
+      setShowAddExpense(true); // Show the add expense form/component
+    } else if (menuItem === 'expenses') {
+      setShowAddExpense(false); // Close Add Expense form if open
     }
   };
 
@@ -91,7 +98,8 @@ const Dashboard = () => {
         loading={loading}
         notices={notices}
         handleLogout={handleLogout}
-        setLoading={setLoading} // Pass setLoading function to MainContent
+        showAddExpense={showAddExpense} // Pass showAddExpense state to MainContent
+        setShowAddExpense={setShowAddExpense} // Pass setShowAddExpense function to MainContent
       />
     </div>
   );
@@ -100,7 +108,7 @@ const Dashboard = () => {
 // Sidebar Component
 const Sidebar = ({ selectedMenuItem, handleMenuItemClick }) => {
   return (
-    <div className="bg-gray-800 text-white w-64 p-8">
+    <div className="bg-gray-800 text-white w-64 p-8 fixed inset-y-0 left-0">
       {/* Logo or Brand */}
       <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
 
@@ -110,6 +118,10 @@ const Sidebar = ({ selectedMenuItem, handleMenuItemClick }) => {
         <MenuItem text="Mess Menu" isSelected={selectedMenuItem === 'mess-menu'} onClick={() => handleMenuItemClick('mess-menu')} />
         <MenuItem text="All Complaints" isSelected={selectedMenuItem === 'all-complaints'} onClick={() => handleMenuItemClick('all-complaints')} />
         <MenuItem text="Notices" isSelected={selectedMenuItem === 'notices'} onClick={() => handleMenuItemClick('notices')} />
+        {/* Add Expense menu item is only visible when 'Add Expense' is selected */}
+        {selectedMenuItem === 'add-expense' && (
+          <MenuItem text="Add Expense" isSelected={selectedMenuItem === 'add-expense'} onClick={() => handleMenuItemClick('add-expense')} />
+        )}
       </ul>
     </div>
   );
@@ -127,9 +139,9 @@ const MenuItem = ({ text, isSelected, onClick }) => {
 };
 
 // MainContent Component
-const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, handleLogout, setLoading }) => {
+const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, handleLogout, showAddExpense, setShowAddExpense }) => {
   return (
-    <div className="flex-1 bg-gray-100 p-8">
+    <div className="flex-1 bg-gray-100 p-8 ml-64"> {/* Add ml-64 to create space for the sidebar */}
       {/* Logout Button */}
       <div className="flex justify-end mb-4">
         <button
@@ -147,19 +159,32 @@ const MainContent = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, not
         onExpenseUpdate={onExpenseUpdate}
         loading={loading}
         notices={notices}
-        setLoading={setLoading} // Pass setLoading function to MainContentArea
+        showAddExpense={showAddExpense} // Pass showAddExpense state to MainContentArea
+        setShowAddExpense={setShowAddExpense} // Pass setShowAddExpense function to MainContentArea
       />
     </div>
   );
 };
 
 // MainContentArea Component
-const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, setLoading }) => {
+const MainContentArea = ({ selectedMenuItem, expenses, onExpenseUpdate, loading, notices, showAddExpense, setShowAddExpense }) => {
   return (
     <div>
       {/* Conditional Rendering based on selectedMenuItem */}
-      {selectedMenuItem === 'expenses' && <Expenses expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />}
-      {selectedMenuItem === 'notices' && <Notices notices={notices} setLoading={setLoading} />} {/* Render Notices component */}
+      {selectedMenuItem === 'expenses' && !showAddExpense && <Expenses expenses={expenses} onExpenseUpdate={onExpenseUpdate} loading={loading} />}
+      {selectedMenuItem === 'notices' && <Notices notices={notices} />} {/* Render Notices component */}
+      {showAddExpense && (
+        <AddExpense
+          onClose={() => setShowAddExpense(false)} // Pass function to close AddExpenseForm
+          onExpenseAdd={(newExpense) => {
+            // Handle adding expense logic here if needed
+            console.log('New expense added:', newExpense);
+            // You may want to fetch expenses again after adding new expense
+            // fetchExpenses();
+            setShowAddExpense(false); // Close the form after adding expense
+          }}
+        />
+      )}
       {/* Add other conditional rendering based on selectedMenuItem */}
     </div>
   );

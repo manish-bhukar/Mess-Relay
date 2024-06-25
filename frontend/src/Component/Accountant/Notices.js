@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Notices = ({ loading, setLoading }) => {
+const Notices = () => {
   const [notices, setNotices] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchNotices();

@@ -49,19 +49,17 @@ const Expenses = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (editMode) {
-      if (name === 'total') {
-        setEditedExpense({ ...editedExpense, total: value });
-      } else {
-        setEditedExpense({
-          ...editedExpense,
-          categories: {
-            ...editedExpense.categories,
-            [name]: value
-          }
-        });
-      }
+    let updatedExpense = { ...editedExpense };
+    if (name === 'total') {
+      updatedExpense.total = value;
+    } else {
+      updatedExpense.categories = {
+        ...updatedExpense.categories,
+        [name]: Number(value)
+      };
+      updatedExpense.total = Object.values(updatedExpense.categories).reduce((acc, curr) => acc + curr, 0);
     }
+    setEditedExpense(updatedExpense);
   };
 
   return (
@@ -150,6 +148,7 @@ const Expenses = () => {
                       name="total"
                       value={editedExpense.total || 0}
                       onChange={handleChange}
+                      readOnly
                       className="border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 rounded-md"
                     />
                     <button
