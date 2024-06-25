@@ -34,7 +34,7 @@ const AddExpense = ({ year, setExpenses, expenses }) => {
 
   const handleAddExpense = async () => {
     try {
-      const response = await axios.post(`http://localhost:5000/expenses`, newExpense);
+      const response = await axios.post(`http://localhost:5000/expenses/`, newExpense);
       console.log('Expense added:', response.data);
       toast.success('Expense added successfully!');
       if (newExpense.year === year) {

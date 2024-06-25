@@ -1,13 +1,12 @@
-// controllers/ExpenseController.js
 const Expense = require('../Models/ExpenseModel.js');
 const mongoose = require('mongoose');
 
 const getExpensesByYear = async (req, res) => {
   const { year } = req.params;
-  const userId = req.user._id;
+  const user= req.user;
 
   try {
-    const expenses = await Expense.find({  year });
+    const expenses = await Expense.find({ hostel:user.hostel, year }); // Fetch expenses for the specific user and year
     res.json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -18,17 +17,17 @@ const getExpensesByYear = async (req, res) => {
 const saveExpense = async (req, res) => {
   const { month, categories, total, year } = req.body;
   const userId = req.user._id;
+  const hostelname = req.user.hostel; // Assuming hostelname is stored in req.user
 
-  // // Check for required fields
-  // if (!month || !vegetable || !fruits || !provisions || !other || !total || !year) {
-  //   return res.status(400).json({ error: 'Please fill in all fields' });
-  // }
+  // Check for required fields
+ 
 
   try {
     const newExpense = new Expense({
       user: userId,
       year,
       month,
+      hostelname, // Include hostelname in the expense document
       categories: {
         vegetable: categories.vegetable || 0,
         fruits: categories.fruits || 0,
@@ -55,9 +54,9 @@ const editExpense = async (req, res) => {
   }
 
   // Check for required fields
-  // if (!year || !month || !categories || !total) {
-  //   return res.status(400).json({ error: 'Please fill in all fields' });
-  // }
+  if (!year || !month || !categories || !total) {
+    return res.status(400).json({ error: 'Please fill in all fields' });
+  }
 
   try {
     const updatedExpense = await Expense.findByIdAndUpdate(

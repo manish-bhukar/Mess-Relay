@@ -119,9 +119,9 @@ const Sidebar = ({ selectedMenuItem, handleMenuItemClick }) => {
         <MenuItem text="All Complaints" isSelected={selectedMenuItem === 'all-complaints'} onClick={() => handleMenuItemClick('all-complaints')} />
         <MenuItem text="Notices" isSelected={selectedMenuItem === 'notices'} onClick={() => handleMenuItemClick('notices')} />
         {/* Add Expense menu item is only visible when 'Add Expense' is selected */}
-        {selectedMenuItem === 'add-expense' && (
+       
           <MenuItem text="Add Expense" isSelected={selectedMenuItem === 'add-expense'} onClick={() => handleMenuItemClick('add-expense')} />
-        )}
+      
       </ul>
     </div>
   );
