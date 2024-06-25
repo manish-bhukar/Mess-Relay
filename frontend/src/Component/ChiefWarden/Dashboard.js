@@ -1,10 +1,9 @@
-// ChiefWardenDashboard.js (updated)
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Expenses from '../Accountant/Expenses'; // Import Expenses component (if it exists)
 import ComplaintForm from '../Student/Complaint';
 import ManageNotices from './Notice';
-import Expenses from '../Accountant/Expenses';
 import MessMenu from './MessMenu';
 
 const ChiefWardenDashboard = () => {
@@ -14,6 +13,8 @@ const ChiefWardenDashboard = () => {
   const [resolveModalOpen, setResolveModalOpen] = useState(false); // State for modal open/close
   const [selectedComplaint, setSelectedComplaint] = useState(null); // State to track the selected complaint
   const [resolutionDescription, setResolutionDescription] = useState(''); // State for resolution description input
+  const [yearInput, setYearInput] = useState(''); // State for year input
+  const [expenses, setExpenses] = useState([]); // State for expenses
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +28,8 @@ const ChiefWardenDashboard = () => {
     } else if (menuItem === 'notices') {
       navigate('/notice');
     } else if (menuItem === 'expenses') {
-      navigate('/expenses');
+      setExpenses([]); // Reset expenses state
+      setYearInput(''); // Reset year input state
     } else if (menuItem === 'mess-menu') {
       navigate('/messmenu');
     }
@@ -42,6 +44,30 @@ const ChiefWardenDashboard = () => {
       console.error('Error fetching complaints:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/expenses/${yearInput}`);
+      console.log(response.data);
+      setExpenses(response.data);
+    } catch (error) {
+      console.error(`Error fetching expenses for year ${yearInput}:`, error);
+    }
+  };
+
+  const handleYearInputChange = (event) => {
+    setYearInput(event.target.value);
+  };
+
+  const handleFetchExpenses = () => {
+    // Validate year input before fetching expenses
+    const validYear = /^\d{4}$/;
+    if (validYear.test(yearInput)) {
+      fetchExpenses();
+    } else {
+      alert("Please enter a valid year (YYYY format).");
     }
   };
 
@@ -93,41 +119,21 @@ const ChiefWardenDashboard = () => {
           <MainContent
             selectedMenuItem={selectedMenuItem}
             complaints={complaints}
+            expenses={expenses}
+            yearInput={yearInput}
             onResolveComplaint={handleResolveComplaint}
+            onYearInputChange={handleYearInputChange}
+            onFetchExpenses={handleFetchExpenses}
             loading={loading}
+            resolveModalOpen={resolveModalOpen}
+            onResolveModalClose={() => setResolveModalOpen(false)}
+            resolutionDescription={resolutionDescription}
+            onResolutionDescriptionChange={(e) => setResolutionDescription(e.target.value)}
+            onSaveResolution={handleSaveResolution}
+            onCancelResolution={handleCancelResolution}
           />
         </div>
       </div>
-
-      {/* Resolve Modal */}
-      {resolveModalOpen && selectedComplaint && (
-        <div className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">Resolve Complaint</h2>
-            <p className="mb-4">Enter resolution description:</p>
-            <textarea
-              value={resolutionDescription}
-              onChange={(e) => setResolutionDescription(e.target.value)}
-              className="border border-gray-300 p-2 rounded-md w-full h-32"
-              placeholder="Describe how the complaint was resolved..."
-            ></textarea>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleCancelResolution}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded mr-2"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveResolution}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -156,7 +162,22 @@ const MenuItem = ({ text, isSelected, onClick }) => {
   );
 };
 
-const MainContent = ({ selectedMenuItem, complaints, onResolveComplaint, loading }) => {
+const MainContent = ({
+  selectedMenuItem,
+  complaints,
+  expenses,
+  yearInput,
+  onResolveComplaint,
+  onYearInputChange,
+  onFetchExpenses,
+  loading,
+  resolveModalOpen,
+  onResolveModalClose,
+  resolutionDescription,
+  onResolutionDescriptionChange,
+  onSaveResolution,
+  onCancelResolution
+}) => {
   return (
     <div>
       {selectedMenuItem === 'complaints' && (
@@ -186,7 +207,54 @@ const MainContent = ({ selectedMenuItem, complaints, onResolveComplaint, loading
           </ul>
         </div>
       )}
-      {/* Include other MainContent components for 'notices', 'expenses', and 'mess-menu' */}
+
+      {selectedMenuItem === 'expenses' && (
+        <div>
+          <h1 className="text-2xl font-bold mb-4">Expenses</h1>
+          <div className="mb-4">
+            <input
+              type="number" // Ensure input is type number
+              value={yearInput}
+              onChange={onYearInputChange}
+              placeholder="Enter Year (YYYY)"
+              className="p-2 border border-gray-400 rounded text-black"
+            />
+            <button
+              onClick={onFetchExpenses}
+              className="ml-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded"
+            >
+              Fetch Expenses
+            </button>
+          </div>
+          {expenses.length === 0 ? (
+            <p className="text-gray-500">No expenses available for the selected year.</p>
+          ) : (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Expenses for {yearInput}</h2>
+              <ul className="divide-y divide-gray-200">
+                {expenses.map((expense) => (
+                  <li key={expense._id} className="py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <span className="font-semibold">{expense.month}</span>
+                        <span className="ml-2">({expense.year})</span>
+                      </div>
+                      <div className="flex ml-4">
+                        <span className="mr-4">Vegetable: {expense.categories.vegetable}</span>
+                        <span className="mr-4">Fruits: {expense.categories.fruits}</span>
+                        <span className="mr-4">Provisions: {expense.categories.provisions}</span>
+                        <span>Other: {expense.categories.other}</span>
+                      </div>
+                      <div className="font-semibold">Total: {expense.total}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+      {/* Include other MainContent components for 'notices' and 'mess-menu' */}
     </div>
   );
 };

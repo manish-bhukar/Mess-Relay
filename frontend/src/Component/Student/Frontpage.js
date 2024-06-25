@@ -6,6 +6,8 @@ function DashboardMain() {
   const [selectedMenuItem, setSelectedMenuItem] = useState("Dashboard");
   const [userName, setUserName] = useState("John Doe");
   const [notices, setNotices] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [yearInput, setYearInput] = useState(""); // State for year input
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,12 +23,26 @@ function DashboardMain() {
     }
   };
 
+  const fetchExpenses = async (year) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/expenses/${year}`);
+      setExpenses(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error(`Error fetching expenses for year ${year}:`, error);
+    }
+  };
+
   const handleMenuItemClick = (menuItem) => {
     setSelectedMenuItem(menuItem);
     if (menuItem === "Dashboard") {
       navigate("/studentmain");
     } else if (menuItem === "Previous Complaints") {
       navigate("/complainstatus");
+    } else if (menuItem === "Expenses") {
+      // Reset expenses and year input on click
+      setExpenses([]);
+      setYearInput("");
     } else {
       navigate(`/${menuItem.toLowerCase().replace(/ /g, "-")}`);
     }
@@ -40,6 +56,20 @@ function DashboardMain() {
     navigate("/login");
   };
 
+  const handleYearInputChange = (event) => {
+    setYearInput(event.target.value);
+  };
+
+  const handleFetchExpenses = () => {
+    // Validate year input before fetching expenses
+    const validYear = /^\d{4}$/;
+    if (validYear.test(yearInput)) {
+      fetchExpenses(yearInput);
+    } else {
+      alert("Please enter a valid year (YYYY format).");
+    }
+  };
+
   const menuItems = [
     "Dashboard",
     "Complain",
@@ -49,6 +79,7 @@ function DashboardMain() {
     "Rules",
     "Mnnit Alld",
     "Contact",
+    "Expenses", // Added Expenses to the menu
   ];
 
   return (
@@ -95,6 +126,52 @@ function DashboardMain() {
             {selectedMenuItem === "Previous Complaints" && (
               <div>
                 {/* Render previous complaints content */}
+              </div>
+            )}
+            {selectedMenuItem === "Expenses" && (
+              <div>
+                {/* Render expenses content */}
+                <div className="mb-4">
+                  <input
+                    type="number" // Changed type to 'number'
+                    value={yearInput}
+                    onChange={handleYearInputChange}
+                    placeholder="Enter Year (YYYY)"
+                    className="p-2 border border-gray-400 rounded text-black"
+                  />
+                  <button
+                    onClick={handleFetchExpenses}
+                    className="ml-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                  >
+                    Fetch Expenses
+                  </button>
+                </div>
+                {expenses.length === 0 ? (
+                  <p className="text-gray-500">No expenses available for the selected year.</p>
+                ) : (
+                  <div>
+                    <h2 className="text-xl font-bold mb-4">Expenses for {yearInput}</h2>
+                    <ul className="divide-y divide-gray-200">
+                      {expenses.map((expense) => (
+                        <li key={expense._id} className="py-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <span className="font-semibold">{expense.month}</span>
+                              <span className="ml-2">({expense.year})</span>
+                            </div>
+                            <div className="flex ml-4">
+                              <span className="mr-4">Vegetable: {expense.categories.vegetable}</span>
+                              <span className="mr-4">Fruits: {expense.categories.fruits}</span>
+                              <span className="mr-4">Provisions: {expense.categories.provisions}</span>
+                              <span>Other: {expense.categories.other}</span>
+                            </div>
+                            <div className="font-semibold">Total: {expense.total}</div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
             {/* Add more conditions for other menu items */}

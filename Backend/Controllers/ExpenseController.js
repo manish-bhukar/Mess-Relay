@@ -7,7 +7,7 @@ const getExpensesByYear = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const expenses = await Expense.find({ user: userId, year });
+    const expenses = await Expense.find({  year });
     res.json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);
