@@ -2,11 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const MessMenu = require('../Models/MessMenu.js');
+const { authenticateUser } = require('../Middleware/Auth.js');
 
 // Get all menus
+router.use(authenticateUser);
+
 router.get('/', async (req, res) => {
   try {
-    const menus = await MessMenu.find({});
+    const hostel=req.user.hostel;
+    const menus = await MessMenu.find({hostel});
     res.json(menus);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });

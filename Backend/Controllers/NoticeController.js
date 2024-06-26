@@ -36,7 +36,8 @@ const addNotice = async (req, res) => {
 // New function to get all notices
 const getNotices = async (req, res) => {
   try {
-    const notices = await Notice.find(); // Fetch all notices from the database
+    const hostel=req.user.hostel;
+    const notices = await Notice.find({hostel}); // Fetch all notices from the database
     res.json(notices);
   } catch (error) {
     console.error("Error fetching notices:", error);
