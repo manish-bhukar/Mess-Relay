@@ -64,7 +64,24 @@ const loginUser = async (req, res) => {
   }
 };
 
+const findUser=async (req, res) => {
+  try {
+    const userId = req.query.userId; // Assuming userId is passed as a query parameter
+    // Fetch user details from MongoDB based on userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ userName: user.name }); // Sending userName back to the client
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
+  findUser
 };

@@ -27,6 +27,10 @@ const complaintSchema = new mongoose.Schema({
   },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
   dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
+  hostel: {
+    type: String,
+    required: true, // Adjust validation as needed
+  },
 });
 
 module.exports = mongoose.model("Complaint", complaintSchema);

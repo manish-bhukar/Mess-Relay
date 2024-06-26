@@ -4,15 +4,28 @@ import { useNavigate } from "react-router-dom";
 
 function DashboardMain() {
   const [selectedMenuItem, setSelectedMenuItem] = useState("Dashboard");
-  const [userName, setUserName] = useState("John Doe");
+  const [userName, setUserName] = useState("");
   const [notices, setNotices] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [yearInput, setYearInput] = useState(""); // State for year input
+  const [yearInput, setYearInput] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotices();
+    fetchUserData(); // Fetch user data including userName on component mount
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId'); // Retrieve userId from localStorage
+      const response = await axios.get(`http://localhost:5000/user/details?userId=${userId}`);
+      const userData = response.data;
+      console.log(userData);
+      setUserName(userData.userName);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   const fetchNotices = async () => {
     try {
@@ -27,7 +40,6 @@ function DashboardMain() {
     try {
       const response = await axios.get(`http://localhost:5000/expenses/${year}`);
       setExpenses(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error(`Error fetching expenses for year ${year}:`, error);
     }
@@ -40,7 +52,6 @@ function DashboardMain() {
     } else if (menuItem === "Previous Complaints") {
       navigate("/complainstatus");
     } else if (menuItem === "Expenses") {
-      // Reset expenses and year input on click
       setExpenses([]);
       setYearInput("");
     } else {
@@ -49,7 +60,6 @@ function DashboardMain() {
   };
 
   const handleLogout = () => {
-    // Logic for logging out
     localStorage.removeItem('position');
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
@@ -61,7 +71,6 @@ function DashboardMain() {
   };
 
   const handleFetchExpenses = () => {
-    // Validate year input before fetching expenses
     const validYear = /^\d{4}$/;
     if (validYear.test(yearInput)) {
       fetchExpenses(yearInput);
@@ -112,7 +121,7 @@ function DashboardMain() {
               alt="Random"
               className="rounded-full mb-4"
             />
-            <p className="text-lg font-semibold">{userName}</p>
+            <p className="text-lg font-semibold">{userName}</p> {/* Display userName */}
           </div>
         ) : (
           <div>

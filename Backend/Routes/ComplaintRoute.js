@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const complaintController = require("../controllers/complaintController.js");
 const {resolveComplaint}=require("../controllers/complaintController.js");
+const { authenticateUser } = require("../Middleware/Auth.js");
 // POST /api/complaints - Submit a new complaint
+router.use(authenticateUser);
 router.post("/", complaintController.submitComplaint);
 
 // GET /api/complaints/getcomplaints - Get all complaints

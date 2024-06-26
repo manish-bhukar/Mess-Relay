@@ -1,6 +1,6 @@
 const Complaint = require("../Models/ComplainModel.js");
 const mongoose=require('mongoose');
-const {Types}=mongoose
+
 const submitComplaint = async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
@@ -12,7 +12,7 @@ const submitComplaint = async (req, res) => {
 
     // Move the uploaded file to the uploads directory
     const fileName = `${Date.now()}_${file.name}`;
-
+ const hostel=req.user.hostel;
     // Ensure the 'uploads' directory exists
     const uploadPath = `${__dirname}/../uploads/${fileName}`;
     file.mv(uploadPath, async (err) => {
@@ -25,6 +25,7 @@ const submitComplaint = async (req, res) => {
       const newComplaint = new Complaint({
         title,
         description,
+        hostel,
         file: `/uploads/${fileName}`, // Store the file path
       });
       await newComplaint.save();
@@ -39,29 +40,14 @@ const submitComplaint = async (req, res) => {
 
 const getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find();
+    const hostel=req.user.hostel;
+    const complaints = await Complaint.find({hostel});
     res.json(complaints);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// const resolveComplaint = async (req, res) => {
-//   try {
-//     const { complaintId } = req.params;
-
-//     const updatedComplaint = await Complaint.findByIdAndUpdate(
-//       complaintId,
-//       { resolved: true, resolvedAt: new Date() },
-//       { new: true }
-//     );
-
-//     res.status(200).json(updatedComplaint);
-//   } catch (error) {
-//     console.error('Error resolving complaint:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// };
 const likeComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
