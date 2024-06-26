@@ -83,6 +83,7 @@ const ChiefWardenDashboard = () => {
       });
       setResolveModalOpen(false);
       setResolutionDescription(''); // Reset resolution description state
+      setSelectedComplaint(null); // Clear selected complaint state
       fetchComplaints(); // Fetch updated complaints list
     } catch (error) {
       console.error('Error saving resolution:', error);
@@ -252,6 +253,34 @@ const MainContent = ({
               </ul>
             </div>
           )}
+        </div>
+      )}
+
+      {resolveModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Resolve Complaint</h2>
+            <textarea
+              className="w-full p-2 border border-gray-400 rounded mb-4"
+              placeholder="Provide resolution description..."
+              value={resolutionDescription}
+              onChange={onResolutionDescriptionChange}
+            />
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded mr-2"
+                onClick={onCancelResolution}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={onSaveResolution}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
       )}
       {/* Include other MainContent components for 'notices' and 'mess-menu' */}
