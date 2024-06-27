@@ -1,44 +1,43 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "./index.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/uploads/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/notices/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/messmenu/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/user/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/complaints/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/expenses/(.*)",
-        "dest": "/index.js"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/index.js"
-      }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/download/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/user/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/apps/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/seeker/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/alljob/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/email/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.js"
+    }
+  ]
+}
