@@ -17,6 +17,8 @@ app.use(express.json());
 app.use(
   cors({
     origin: "*",
+    credentials:true,            
+    optionSuccessStatus:200
   })
 );
 app.use(fileUpload());
