@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const complaintController = require("../controllers/complaintController.js");
-const {resolveComplaint}=require("../controllers/complaintController.js");
+const complaintController = require("../Controllers/Complaintcontroller.js");
+const {resolveComplaint}=require("../Controllers/Complaintcontroller.js");
 const { authenticateUser } = require("../Middleware/Auth.js");
 // POST /api/complaints - Submit a new complaint
 router.use(authenticateUser);
