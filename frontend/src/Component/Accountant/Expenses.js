@@ -10,7 +10,7 @@ const Expenses = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/expenses/${year}`);
+        const response = await axios.get(`https://mess-relay--sigma.vercel.app/expenses/${year}`);
         setExpenses(response.data);
       } catch (error) {
         console.error('Error fetching expenses:', error);
@@ -29,7 +29,7 @@ const Expenses = () => {
 
   const handleSaveEdit = async () => {
     try {
-      const response = await axios.put(`http://localhost:5000/expenses/${editedExpense._id}`, editedExpense);
+      const response = await axios.put(`https://mess-relay--sigma.vercel.app/expenses/${editedExpense._id}`, editedExpense);
       console.log('Expense updated:', response.data);
 
       const updatedExpenses = expenses.map(exp => {

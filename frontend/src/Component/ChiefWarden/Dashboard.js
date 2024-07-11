@@ -38,7 +38,7 @@ const ChiefWardenDashboard = () => {
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/complaints/getcomplaints');
+      const response = await axios.get('https://mess-relay--sigma.vercel.app/complaints/getcomplaints');
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -49,7 +49,7 @@ const ChiefWardenDashboard = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/expenses/${yearInput}`);
+      const response = await axios.get(`https://mess-relay--sigma.vercel.app/expenses/${yearInput}`);
       console.log(response.data);
       setExpenses(response.data);
     } catch (error) {
@@ -78,7 +78,7 @@ const ChiefWardenDashboard = () => {
 
   const handleSaveResolution = async () => {
     try {
-      await axios.put(`http://localhost:5000/complaints/resolve/${selectedComplaint._id}`, {
+      await axios.put(`https://mess-relay--sigma.vercel.app/complaints/resolve/${selectedComplaint._id}`, {
         resolutionDescription
       });
       setResolveModalOpen(false);

@@ -14,7 +14,7 @@ const MessMenuViewer = () => {
   const fetchMenus = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/messmenu');
+      const response = await axios.get('https://mess-relay--sigma.vercel.app/messmenu');
       const menusData = response.data.reduce((acc, menu) => {
         acc[menu.day] = menu.meals;
         return acc;

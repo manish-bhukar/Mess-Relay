@@ -20,7 +20,7 @@ export default function Signup() {
     }
 
     try {
-      const response = await axios.post("https://mess-relay2-4ttj6yffr-manish-bhukars-projects.vercel.app/user/register", {
+      const response = await axios.post("https://mess-relay--sigma.vercel.app/user/register", {
         name,
         email,
         password,

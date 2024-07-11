@@ -21,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/user/login",
+        "https://mess-relay--sigma.vercel.app/user/login",
         {
           email,
           password,

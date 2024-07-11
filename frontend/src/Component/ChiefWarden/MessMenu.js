@@ -16,7 +16,7 @@ const MessMenu = () => {
   const fetchMenus = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/messmenu');
+      const response = await axios.get('https://mess-relay--sigma.vercel.app/messmenu');
       const menusData = response.data.reduce((acc, menu) => {
         acc[menu.day] = menu.meals;
         return acc;
@@ -43,7 +43,7 @@ const MessMenu = () => {
     setLoading(true);
     try {
       const meals = menus[day];
-      await axios.post('http://localhost:5000/messmenu', { day, meals });
+      await axios.post('https://mess-relay--sigma.vercel.app/messmenu', { day, meals });
       toast.success('Menu saved successfully');
       fetchMenus();
     } catch (error) {

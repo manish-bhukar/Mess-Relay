@@ -13,7 +13,7 @@ const Notices = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/notices/getnotice');
+      const response = await axios.get('https://mess-relay--sigma.vercel.app/notices/getnotice');
       setNotices(response.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -31,7 +31,7 @@ const Notices = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post('http://localhost:5000/notices', formData, {
+      const response = await axios.post('https://mess-relay--sigma.vercel.app/notices', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -51,7 +51,7 @@ const Notices = () => {
 
   const handleDeleteNotice = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/notices/${id}`);
+      await axios.delete(`https://mess-relay--sigma.vercel.app/notices/${id}`);
       fetchNotices(); // Refresh notices after deletion
       toast.success('Notice deleted successfully');
     } catch (error) {
@@ -74,7 +74,7 @@ const Notices = () => {
             {notices.map((notice) => (
               <li key={notice._id} className="mb-2 flex justify-between items-center">
                 <a 
-                  href={`http://localhost:5000${notice.file}`} 
+                  href={`https://mess-relay--sigma.vercel.app${notice.file}`} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-blue-500 underline"
