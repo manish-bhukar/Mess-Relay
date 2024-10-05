@@ -15,23 +15,38 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Corrected password regex
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+    // Validate password and confirm password match
     if (password !== confirmPassword) {
       return toast.error("Passwords do not match");
     }
 
+    // Validate password strength
+    if (!passwordRegex.test(password)) {
+      return toast.error(
+        "Password must be at least 8 characters long, include one uppercase, one lowercase letter, one number, and one special character."
+      );
+    }
+
     try {
-      const response = await axios.post("https://mess-relay--sigma.vercel.app/user/register", {
-        name,
-        email,
-        password,
-        position,
-        hostel,
-        registrationNumber, // Include registration number in the POST request
-      }, {
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        "http://localhost:5000/user/register",
+        {
+          name,
+          email,
+          password,
+          position,
+          hostel,
+          registrationNumber, // Include registration number in the POST request
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }
+      );
       console.log(response.data);
       toast.success("Signup successful!");
     } catch (error) {
@@ -47,7 +62,12 @@ export default function Signup() {
   return (
     <>
       <Toaster />
-      <div className="flex h-screen bg-cover bg-center" style={{ backgroundImage: `url('https://media.istockphoto.com/id/1191080960/photo/traditional-turkish-breakfast-and-people-taking-various-food-wide-composition.jpg?s=612x612&w=0&k=20&c=PP5ejMisEwzcLWrNmJ8iPPm_u-4P6rOWHEDpBPL2n7Q=')` }}>
+      <div
+        className="flex h-screen bg-cover bg-center"
+        style={{
+          backgroundImage: `url('https://media.istockphoto.com/id/1191080960/photo/traditional-turkish-breakfast-and-people-taking-various-food-wide-composition.jpg?s=612x612&w=0&k=20&c=PP5ejMisEwzcLWrNmJ8iPPm_u-4P6rOWHEDpBPL2n7Q=')`,
+        }}
+      >
         <div className="m-auto w-full max-w-md bg-white bg-opacity-80 rounded-lg shadow-lg p-8">
           <div>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900 text-left">
@@ -57,7 +77,6 @@ export default function Signup() {
 
           <div className="mt-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              
               {/* Name */}
               <div className="flex flex-col">
                 <label
@@ -116,7 +135,9 @@ export default function Signup() {
                   onChange={(e) => setPosition(e.target.value)}
                   className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
-                  <option value="" disabled>Select your position</option>
+                  <option value="" disabled>
+                    Select your position
+                  </option>
                   <option value="student">Student</option>
                   <option value="accountant">Accountant</option>
                   <option value="chief-warden">Chief Warden</option>
@@ -124,29 +145,29 @@ export default function Signup() {
               </div>
 
               {/* Hostel */}
-              
-                <div className="flex flex-col">
-                  <label
-                    htmlFor="hostel"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Hostel
-                  </label>
-                  <select
-                    id="hostel"
-                    name="hostel"
-                    required
-                    value={hostel}
-                    onChange={(e) => setHostel(e.target.value)}
-                    className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
-                    <option value="" disabled>Select hostel</option>
-                    <option value="svbh">SVBH</option>
-                    <option value="raman-hostel">Raman Hostel</option>
-                    <option value="new-hostel">New Hostel</option>
-                  </select>
-                </div>
-              
+              <div className="flex flex-col">
+                <label
+                  htmlFor="hostel"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Hostel
+                </label>
+                <select
+                  id="hostel"
+                  name="hostel"
+                  required
+                  value={hostel}
+                  onChange={(e) => setHostel(e.target.value)}
+                  className="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option value="" disabled>
+                    Select hostel
+                  </option>
+                  <option value="svbh">SVBH</option>
+                  <option value="raman-hostel">Raman Hostel</option>
+                  <option value="new-hostel">New Hostel</option>
+                </select>
+              </div>
 
               {/* Registration Number (only for students) */}
               {position === "student" && (

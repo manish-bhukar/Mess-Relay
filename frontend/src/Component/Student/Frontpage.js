@@ -18,7 +18,7 @@ function DashboardMain() {
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem('userId'); // Retrieve userId from localStorage
-      const response = await axios.get(`https://mess-relay--sigma.vercel.app/user/details?userId=${userId}`);
+      const response = await axios.get(`http://localhost:5000/user/details?userId=${userId}`);
       const userData = response.data;
       console.log(userData);
       setUserName(userData.userName);
@@ -29,7 +29,7 @@ function DashboardMain() {
 
   const fetchNotices = async () => {
     try {
-      const response = await axios.get('https://mess-relay--sigma.vercel.app/getnotice');
+      const response = await axios.get('http://localhost:5000/getnotice');
       setNotices(response.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -38,7 +38,7 @@ function DashboardMain() {
 
   const fetchExpenses = async (year) => {
     try {
-      const response = await axios.get(`https://mess-relay--sigma.vercel.app/expenses/${year}`);
+      const response = await axios.get(`http://localhost:5000/expenses/${year}`);
       setExpenses(response.data);
     } catch (error) {
       console.error(`Error fetching expenses for year ${year}:`, error);

@@ -15,7 +15,7 @@ const App = () => {
 
   const fetchComplaints = async () => {
     try {
-      const response = await axios.get('https://mess-relay--sigma.vercel.app/complaints/getcomplaints');
+      const response = await axios.get('http://localhost:5000/complaints/getcomplaints');
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -23,14 +23,14 @@ const App = () => {
   };
 
   const handleDownload = (fileName) => {
-    const downloadUrl = `https://mess-relay--sigma.vercel.app${fileName}`;
+    const downloadUrl = `http://localhost:5000/${fileName}`;
     window.open(downloadUrl, '_blank');
   };
 
   const handleLike = async (complaintId) => {
     const studentId = localStorage.getItem('userId');
     try {
-      const response = await axios.post(`https://mess-relay--sigma.vercel.app/${complaintId}/like`, { studentId });
+      const response = await axios.post(`http://localhost:5000/${complaintId}/like`, { studentId });
       const updatedComplaints = complaints.map(complaint =>
         complaint._id === complaintId ? { ...complaint, liked: true, likes: complaint.likes + 1, successMessage: response.data.message } : complaint
       );
@@ -61,7 +61,7 @@ const App = () => {
   const handleDislike = async (complaintId) => {
     const studentId = localStorage.getItem('userId');
     try {
-      const response = await axios.post(`https://mess-relay--sigma.vercel.app/${complaintId}/dislike`, { studentId });
+      const response = await axios.post(`http://localhost:5000/${complaintId}/dislike`, { studentId });
       const updatedComplaints = complaints.map(complaint =>
         complaint._id === complaintId ? { ...complaint, disliked: true, dislikes: complaint.dislikes + 1, successMessage: response.data.message } : complaint
       );
