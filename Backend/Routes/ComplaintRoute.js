@@ -4,6 +4,7 @@ const complaintController = require("../Controllers/Complaintcontroller.js");
 const {resolveComplaint}=require("../Controllers/Complaintcontroller.js");
 const { authenticateUser } = require("../Middleware/Auth.js");
 // POST /api/complaints - Submit a new complaint
+const {likeComplaint}=require("../Controllers/Complaintcontroller.js");
 router.use(authenticateUser);
 router.post("/", complaintController.submitComplaint);
 
@@ -14,9 +15,9 @@ router.get("/getcomplaints", complaintController.getAllComplaints);
 router.put("/:complaintId/resolve", complaintController.resolveComplaint);
 
 // POST /api/complaints/:complaintId/like - Like a complaint by ID
-router.post("/:complaintId/like", complaintController.likeComplaint);
+router.post("/like/:complaintId", likeComplaint);
 
 // POST /api/complaints/:complaintId/dislike - Dislike a complaint by ID
-router.post("/:complaintId/dislike", complaintController.dislikeComplaint);
+router.post("/dislike/:complaintId", complaintController.dislikeComplaint);
 router.put('/resolve/:id', resolveComplaint);
 module.exports = router;

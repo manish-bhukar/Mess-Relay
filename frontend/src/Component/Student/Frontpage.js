@@ -21,7 +21,7 @@ function DashboardMain() {
       const response = await axios.get(`http://localhost:5000/user/details?userId=${userId}`);
       const userData = response.data;
       console.log(userData);
-      setUserName(userData.userName);
+      setUserName(userData.user.name);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -29,10 +29,12 @@ function DashboardMain() {
 
   const fetchNotices = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/getnotice');
+
+      const response = await axios.get('http://localhost:5000/notices/getnotice');
       setNotices(response.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
+     // toast.error('Failed to fetch notices. Please try again.');
     }
   };
 
@@ -199,12 +201,12 @@ function DashboardMain() {
               <li key={notice._id} className="mb-4 flex justify-between items-center">
                 <span>{notice.title}</span>
                 <a
-                  href={`https://mess-relay--sigma.vercel.app${notice.file}`}
+                  href={`http://localhost:5000/${notice.file}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:underline"
                 >
-                  Open Notice
+                  Download Notice
                 </a>
               </li>
             ))

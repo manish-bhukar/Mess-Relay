@@ -47,17 +47,20 @@ const getAllComplaints = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 const likeComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
-    const { studentId } = req.body;
-   
-    if (!mongoose.isValidObjectId(studentId)) {
-      return res.status(400).json({ message: 'Invalid student ID' });
+
+    const studentId = req.user._id; // Assuming studentId comes from the authenticated user
+    console.log({complaintId,studentId});
+    
+    // Validate complaintId
+    if (!mongoose.isValidObjectId(complaintId)) {
+      return res.status(400).json({ message: 'Invalid complaint ID' });
     }
 
     const complaint = await Complaint.findById(complaintId);
+
     if (!complaint) {
       return res.status(404).json({ message: 'Complaint not found' });
     }
@@ -67,30 +70,22 @@ const likeComplaint = async (req, res) => {
       return res.status(400).json({ message: 'You have already liked this complaint' });
     }
 
+    // Remove studentId from dislikes if it exists
     if (complaint.dislikes.includes(studentId)) {
-      // Remove from dislikes if already disliked
-      complaint.dislikes = complaint.dislikes.filter(id => id.toString() !== studentId);
+      complaint.dislikes = complaint.dislikes.filter(id => id.toString() !== studentId.toString());
     }
 
-    const updatedComplaint = await Complaint.findByIdAndUpdate(
-      complaintId,
-      { 
-        $addToSet: { likes: studentId }, // Using $addToSet to add unique studentId to likes array
-        $pull: { dislikes: studentId } // Remove studentId from dislikes array
-      },
-      { new: true }
-    );
+    // Add studentId to likes
+    complaint.likes.push(studentId);
+    await complaint.save();
 
-    if (!updatedComplaint) {
-      return res.status(404).json({ message: 'Complaint not found' });
-    }
-
-    res.status(200).json({ message: 'Complaint liked successfully', complaint: updatedComplaint });
+    res.status(200).json({ message: 'Complaint liked successfully', complaint });
   } catch (error) {
     console.error('Error liking complaint:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 const resolveComplaint = async (req, res) => {
   const { id } = req.params;
@@ -123,9 +118,7 @@ const dislikeComplaint = async (req, res) => {
     const { studentId } = req.body;
 
     const complaint = await Complaint.findById(complaintId);
-    if (!complaint) {
-      return res.status(404).json({ message: 'Complaint not found' });
-    }
+    
 
     if (complaint.dislikes.includes(studentId)) {
       return res.status(400).json({ message: 'You have already disliked this complaint' });

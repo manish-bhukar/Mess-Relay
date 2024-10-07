@@ -13,7 +13,8 @@ const Notices = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await axios.get('https://localhost:5000/notices/getnotice');
+
+      const response = await axios.get('http://localhost:5000/notices/getnotice');
       setNotices(response.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -30,7 +31,11 @@ const Notices = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-
+      const userId=localStorage.getItem('userId');
+      const rsp = await axios.get(`http://localhost:5000/user/details?userId=${userId}`);
+      const hostel=(rsp.data.user.hostel);
+      formData.append('hostel', hostel);
+     
       const response = await axios.post('http://localhost:5000/notices', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -74,7 +79,7 @@ const Notices = () => {
             {notices.map((notice) => (
               <li key={notice._id} className="mb-2 flex justify-between items-center">
                 <a 
-                  href={`http://localhost:5000${notice.file}`} 
+                  href={`http://localhost:5000/${notice.file}`} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-blue-500 underline"

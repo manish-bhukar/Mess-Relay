@@ -40,7 +40,7 @@ const Dashboard = () => {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://mess-relay--sigma.vercel.app/expenses');
+      const response = await axios.get('http://localhost:5000/expenses');
       setExpenses(response.data);
     } catch (error) {
       console.error('Error fetching expenses:', error);
@@ -67,7 +67,7 @@ const Dashboard = () => {
       if (updatedExpense._id) {
         await axios.put(`http://localhost:5000/expenses/${updatedExpense._id}`, updatedExpense);
       } else {
-        await axios.post('https://mess-relay--sigma.vercel.app/expenses/', updatedExpense);
+        await axios.post('http://localhost:5000/expenses/', updatedExpense);
       }
       fetchExpenses();
     } catch (error) {
