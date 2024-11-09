@@ -1,12 +1,7 @@
 const fs = require("fs");
 const Notice = require("../Models/Notice.js");
-const path = require("path");
-const client = require('../Redis/redisClient.js'); // Import the Redis client
-
-// Connect to Redis
-
-
-
+const path=require("path");
+const client = require("../Redis/redisClient.js");
 const addNotice = async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
@@ -17,7 +12,7 @@ const addNotice = async (req, res) => {
     const hostel = req.user.hostel;
     const fileName = `${Date.now()}_${file.name}`;
     const uploadPath = `${__dirname}/../uploads/${fileName}`;
-    
+
     file.mv(uploadPath, async (err) => {
       if (err) {
         console.error(err);
@@ -42,27 +37,27 @@ const addNotice = async (req, res) => {
   }
 };
 
+
+// New function to get all notices
 const getNotices = async (req, res) => {
   try {
     const hostel = req.user.hostel;
     const cacheKey = `notices:${hostel}`;
 
-    // Check Redis cache for notices
-    client.get(cacheKey, async (err, cachedNotices) => {
-      if (err) throw err;
+    // Promisify Redis client to avoid callback-based code
+    const cachedNotices = await client.get(cacheKey);
 
-      if (cachedNotices) {
-        return res.json(JSON.parse(cachedNotices)); // Serve cached data if available
-      } else {
-        // Fetch from MongoDB if not in cache
-        const notices = await Notice.find({ hostel });
-        
-        // Cache the notices with an expiration of 10 minutes
-        client.setEx(cacheKey, 10 * 60, JSON.stringify(notices));
+    if (cachedNotices) {
+      return res.json(JSON.parse(cachedNotices)); // Serve cached data if available
+    } else {
+      // Fetch from MongoDB if not in cache
+      const notices = await Notice.find({ hostel });
 
-        res.json(notices);
-      }
-    });
+      // Cache the notices with an expiration of 10 minutes
+      await client.setEx(cacheKey, 10 * 60, JSON.stringify(notices));
+
+      return res.json(notices);
+    }
   } catch (error) {
     console.error("Error fetching notices:", error);
     res.status(500).send("Failed to fetch notices. Please try again later.");
@@ -99,9 +94,8 @@ const deleteNotice = async (req, res) => {
     res.status(500).send("Failed to delete notice. Please try again later.");
   }
 };
-
 module.exports = {
   addNotice,
   getNotices,
-  deleteNotice,
+  deleteNotice, // Export the new function
 };
