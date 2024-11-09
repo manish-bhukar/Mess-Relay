@@ -61,7 +61,7 @@ const deleteNotice = async (req, res) => {
 
     const filePath = path.join(__dirname, "..", notice.file);
 
-    // Delete the file from the filesystem
+    
     fs.unlink(filePath, async (err) => {
       if (err) {
         console.error("Error deleting file:", err);
@@ -83,3 +83,6 @@ module.exports = {
   getNotices,
   deleteNotice, // Export the new function
 };
+
+
+

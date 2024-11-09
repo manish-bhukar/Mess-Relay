@@ -1,12 +1,28 @@
+// expenseController.js
+const client = require('../Redis/redisClient.js'); // Import the Redis client
 const Expense = require('../Models/ExpenseModel.js');
 const mongoose = require('mongoose');
-
 const getExpensesByYear = async (req, res) => {
   const { year } = req.params;
-  const hostel=req.user.hostel;
-  console.log(hostel)
+  const hostel = req.user.hostel;
+  const cacheKey = `expenses:${hostel}:${year}`;
+
   try {
-    const expenses = await Expense.find({ hostel, year }); // Fetch expenses for the specific user and year
+    // Check if the data is in the cache
+    const cachedExpenses = await client.get(cacheKey);
+
+    if (cachedExpenses) {
+      // Return the cached data if it exists
+     
+      return res.json(JSON.parse(cachedExpenses));
+    }
+
+    // If not in cache, fetch from the database
+    const expenses = await Expense.find({ hostel, year });
+    
+    // Store the result in Redis with an expiration time
+    await client.setEx(cacheKey, 360, JSON.stringify(expenses)); // Cache for 1 hour
+    
     res.json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -14,20 +30,19 @@ const getExpensesByYear = async (req, res) => {
   }
 };
 
+
+
 const saveExpense = async (req, res) => {
   const { month, categories, total, year } = req.body;
   const userId = req.user._id;
-  const hostel = req.user.hostel; // Assuming hostelname is stored in req.user
- 
-  // Check for required fields
- 
-
+  const hostel = req.user.hostel;
+  
   try {
     const newExpense = new Expense({
       user: userId,
       year,
       month,
-      hostel, // Include hostelname in the expense document
+      hostel,
       categories: {
         vegetable: categories.vegetable || 0,
         fruits: categories.fruits || 0,
@@ -38,6 +53,11 @@ const saveExpense = async (req, res) => {
     });
 
     await newExpense.save();
+
+    // Invalidate the cache for this hostel and year
+    const cacheKey = `expenses:${hostel}:${year}`;
+    await client.del(cacheKey);
+
     res.json({ message: 'Expense saved successfully', expense: newExpense });
   } catch (error) {
     console.error('Error saving expense:', error);
@@ -53,7 +73,6 @@ const editExpense = async (req, res) => {
     return res.status(400).json({ error: 'Invalid expense ID' });
   }
 
-  // Check for required fields
   if (!year || !month || !categories || !total) {
     return res.status(400).json({ error: 'Please fill in all fields' });
   }
@@ -79,6 +98,10 @@ const editExpense = async (req, res) => {
       return res.status(404).json({ error: 'Expense not found' });
     }
 
+    // Invalidate the cache for this hostel and year
+    const cacheKey = `expenses:${req.user.hostel}:${year}`;
+    await client.del(cacheKey);
+
     res.json({ message: 'Expense updated successfully', expense: updatedExpense });
   } catch (error) {
     console.error('Error updating expense:', error);
@@ -86,4 +109,4 @@ const editExpense = async (req, res) => {
   }
 };
 
-module.exports = { getExpensesByYear, saveExpense, editExpense };
+module.exports = { getExpensesByYear, saveExpense, editExpense };  
