@@ -1,16 +1,20 @@
 const fs = require("fs");
 const Notice = require("../Models/Notice.js");
-const path=require("path")
+const path = require("path");
+const client = require('../Redis/redisClient.js'); // Import the Redis client
+
+// Connect to Redis
+
+
+
 const addNotice = async (req, res) => {
   try {
-  
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
       return res.status(400).send("No files were uploaded.");
     }
-    console.log(req.user.hostel);
-    const file = req.files.file; // Access the uploaded file
-    const hostel=req.user.hostel;
-    // Move the uploaded file to the uploads directory
+
+    const file = req.files.file;
+    const hostel = req.user.hostel;
     const fileName = `${Date.now()}_${file.name}`;
     const uploadPath = `${__dirname}/../uploads/${fileName}`;
     
@@ -22,10 +26,13 @@ const addNotice = async (req, res) => {
 
       // Save notice details to MongoDB
       const newNotice = new Notice({
-        file: `uploads/${fileName}`, // Store the file path
-        hostel:hostel
+        file: `uploads/${fileName}`,
+        hostel
       });
       await newNotice.save();
+
+      // Invalidate the cache for notices
+      client.del(`notices:${hostel}`);
 
       res.json({ message: "Notice added successfully", notice: newNotice });
     });
@@ -35,21 +42,33 @@ const addNotice = async (req, res) => {
   }
 };
 
-// New function to get all notices
 const getNotices = async (req, res) => {
-  
   try {
-    const hostel=req.user.hostel;
-    const notices = await Notice.find({hostel});
-   
-    res.json(notices);
+    const hostel = req.user.hostel;
+    const cacheKey = `notices:${hostel}`;
+
+    // Check Redis cache for notices
+    client.get(cacheKey, async (err, cachedNotices) => {
+      if (err) throw err;
+
+      if (cachedNotices) {
+        return res.json(JSON.parse(cachedNotices)); // Serve cached data if available
+      } else {
+        // Fetch from MongoDB if not in cache
+        const notices = await Notice.find({ hostel });
+        
+        // Cache the notices with an expiration of 10 minutes
+        client.setEx(cacheKey, 10 * 60, JSON.stringify(notices));
+
+        res.json(notices);
+      }
+    });
   } catch (error) {
     console.error("Error fetching notices:", error);
     res.status(500).send("Failed to fetch notices. Please try again later.");
   }
 };
 
-// New function to delete a notice by ID
 const deleteNotice = async (req, res) => {
   try {
     const noticeId = req.params.id;
@@ -61,7 +80,6 @@ const deleteNotice = async (req, res) => {
 
     const filePath = path.join(__dirname, "..", notice.file);
 
-    
     fs.unlink(filePath, async (err) => {
       if (err) {
         console.error("Error deleting file:", err);
@@ -70,6 +88,10 @@ const deleteNotice = async (req, res) => {
 
       // Delete the notice from the database
       await Notice.findByIdAndDelete(noticeId);
+
+      // Invalidate the cache for notices
+      client.del(`notices:${notice.hostel}`);
+
       res.json({ message: "Notice deleted successfully" });
     });
   } catch (error) {
@@ -81,8 +103,5 @@ const deleteNotice = async (req, res) => {
 module.exports = {
   addNotice,
   getNotices,
-  deleteNotice, // Export the new function
+  deleteNotice,
 };
-
-
-

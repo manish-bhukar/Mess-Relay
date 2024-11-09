@@ -13,9 +13,18 @@ import ProtectedRoute from "./Component/ProtectedRoute.js";
 import MessMenu from "./Component//Student/MessMenu.js";
 import Messmenu from "./Component/ChiefWarden/MessMenu.js";
 import AddExpense from "./Component/Accountant/AddExpense.js";
+import { useEffect } from "react";
+import axios from "axios";
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  }, []);
   return (
     <div className="App">
+     
       <Router>
         <Routes>
           <Route path="/" element={<Signup />} />
