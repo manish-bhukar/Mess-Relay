@@ -87,7 +87,7 @@ function DashboardMain() {
     "Previous Complaints",
     "Mess Menu",
     "WebCrator",
-    "Rules",
+    "Pay Fees",
     "Mnnit Alld",
     "Contact",
     "Expenses", // Added Expenses to the menu

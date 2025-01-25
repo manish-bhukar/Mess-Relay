@@ -3,13 +3,12 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const fileUpload = require("express-fileupload");
 const cors = require('cors');
-
 const userRoutes = require('./Routes/UserRoute.js');
 const complaintsRoutes = require('./Routes/ComplaintRoute.js');
 const expenseRoutes = require('./Routes/ExpenseRoute.js');
 const noticeRoute = require('./Routes/noticeroutes.js');
 const messMenuRoutes = require('./Controllers/MessMenuController.js');
-
+const PaymentRoute = require('./Routes/Payment.js')
 dotenv.config();
 
 const app = express();
@@ -29,6 +28,8 @@ app.use("/messmenu", messMenuRoutes);
 app.use('/user', userRoutes);
 app.use("/complaints", complaintsRoutes);
 app.use('/expenses', expenseRoutes);
+app.use('/payment',PaymentRoute);
+
 
 mongoose.connect(
   process.env.MONGO_URI,
