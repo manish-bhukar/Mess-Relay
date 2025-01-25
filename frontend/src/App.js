@@ -15,6 +15,7 @@ import Messmenu from "./Component/ChiefWarden/MessMenu.js";
 import AddExpense from "./Component/Accountant/AddExpense.js";
 import { useEffect } from "react";
 import axios from "axios";
+import PayFees from "./Component/Student/PayFees.js";
 function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -61,6 +62,9 @@ function App() {
             } />
           <Route path="mess-menu" element={
             <ProtectedRoute><MessMenu/></ProtectedRoute>
+            } />
+            <Route path="pay-fees" element={
+            <ProtectedRoute><PayFees/></ProtectedRoute>
             } />
             <Route path="messmenu" element={
             <ProtectedRoute><Messmenu/></ProtectedRoute>
