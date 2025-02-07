@@ -16,6 +16,7 @@ import AddExpense from "./Component/Accountant/AddExpense.js";
 import { useEffect } from "react";
 import axios from "axios";
 import PayFees from "./Component/Student/PayFees.js";
+import PaymentSuccess from "./Component/Student/PaymentSuccess.js";
 function App() {
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -68,6 +69,9 @@ function App() {
             } />
             <Route path="messmenu" element={
             <ProtectedRoute><Messmenu/></ProtectedRoute>
+            } /> 
+            <Route path="paymentsuccess" element={
+            <ProtectedRoute><PaymentSuccess/></ProtectedRoute>
             } /> 
             <Route path="/addexpense" element={<AddExpense/>}></Route> 
         </Routes>

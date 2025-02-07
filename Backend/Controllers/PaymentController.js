@@ -1,5 +1,6 @@
 const Razorpay = require('razorpay');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 dotenv.config();
 
 const instance = new Razorpay({
@@ -14,10 +15,9 @@ const Checkout = async (req, res) => {
       currency: "INR",
     };
     const order = await instance.orders.create(options);
-    console.log(order);
     res.status(200).json({
-      order,
       success: true,
+      order
     });
   } catch (error) {
     console.error("Error in Checkout:", error);
@@ -27,15 +27,32 @@ const Checkout = async (req, res) => {
     });
   }
 };
-
 const PaymentVerification = async (req, res) => {
   try {
-    res.status(200).json({
-      success: true,
-    });
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.YOUR_KEY_SECRET)
+      .update(body.toString())
+      .digest("hex");
+
+    const isAuthentic = expectedSignature === razorpay_signature;
+
+    if (isAuthentic) {
+      res.redirect(
+        `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
+      );
+      return; 
+    }
+
+    return res.status(400).json({ success: false });
+
   } catch (error) {
     console.error("Error in PaymentVerification:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to verify payment",
     });
@@ -45,6 +62,7 @@ const PaymentVerification = async (req, res) => {
 const GetKey = async (req, res) => {
   try {
     res.status(200).json({ key: process.env.YOUR_KEY_ID });
+   
   } catch (error) {
     console.error("Error in GetKey:", error);
     res.status(500).json({

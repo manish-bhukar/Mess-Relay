@@ -3,11 +3,11 @@ import axios from "axios";
 
 const PayFees = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    hostelName: "",
-    semester: "",
-    regNo: "",
-    email: "",
+    // name: "",
+    // hostelName: "",
+    // semester: "",
+    // regNo: "",
+    // email: "",
     amount: "",
   });
 
@@ -32,31 +32,29 @@ const PayFees = () => {
       const { data:{order} } = await axios.post("http://localhost:5000/payment/checkout", {
         amount: formData.amount,
       });
-     // console.log(data);
       const options = {
-        key, // Enter the Key ID generated from the Dashboard
-        amount: formData.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        key,
+        amount: order.amount,
         currency: "INR",
-        name: "Manish",
-        description: "Test Transaction",
-        image: "https://example.com/your_logo",
-        order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        name: "Manish bhukar",
+        description: "Tutorial of RazorPay",
+        image: "",
+        order_id: order.id,
         callback_url: "http://localhost:5000/payment/paymentverification",
         prefill: {
-            "name": "Gaurav Kumar",
-            "email": "gaurav.kumar@example.com",
-            "contact": "9000090000"
+            name: "Gaurav Kumar",
+            email: "gaurav.kumar@example.com",
+            contact: "9999999999"
         },
         notes: {
             "address": "Razorpay Corporate Office"
         },
         theme: {
-            "color": "#3399cc"
+            "color": "#121212"
         }
-        
     };
-    const rzp = new window.Razorpay(options);
-      rzp.open();
+    const razor = new window.Razorpay(options);
+      razor.open();
     } catch (err) {
       console.error(err);
       setError("An error occurred while processing the payment. Please try again.");
@@ -71,7 +69,7 @@ const PayFees = () => {
           {error && (
             <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
           )}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="block text-sm font-medium mb-2" htmlFor="name">
               Name
             </label>
@@ -140,7 +138,7 @@ const PayFees = () => {
               className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-          </div>
+          </div> */}
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2" htmlFor="amount">
               Amount
